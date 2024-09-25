@@ -1,18 +1,14 @@
 "use client";
 
 import React from "react";
-import { Address as AddressType, formatEther } from "viem";
+import Link from "next/link";
+import { Address as AddressType, Hex, formatEther } from "viem";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { Address } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { generateGoalId } from "~~/utils/akuntabel/generateGoalId";
 
-type GoalsListProps = {
-  address: AddressType | undefined;
-};
-
-const GoalSummary = ({ goalNonce, address }: { goalNonce: bigint; address: AddressType }) => {
-  const goalId = generateGoalId(address, goalNonce);
+const GoalSummary = ({ goalId }: { goalId: Hex }) => {
   const { data: goalDetails } = useScaffoldReadContract({
     contractName: "Akuntabel",
     functionName: "getGoalDetails",
@@ -50,7 +46,7 @@ const GoalSummary = ({ goalNonce, address }: { goalNonce: bigint; address: Addre
   );
 };
 
-export const GoalsList = ({ address }: GoalsListProps) => {
+export const GoalsList = ({ address }: { address: AddressType }) => {
   const { data: goalNonce } = useScaffoldReadContract({
     contractName: "Akuntabel",
     functionName: "goalNonce",
@@ -70,9 +66,18 @@ export const GoalsList = ({ address }: GoalsListProps) => {
       <div className="mt-4">
         <h2 className="text-xl font-semibold mb-2">All Goals</h2>
         <ul className="space-y-4">
-          {Array.from({ length: Number(goalNonce) }).map((_, index) => (
-            <li key={index}>{address && <GoalSummary goalNonce={BigInt(index)} address={address} />}</li>
-          ))}
+          {Array.from({ length: Number(goalNonce) }).map((_, index) => {
+            const goalId = generateGoalId(address, BigInt(index));
+            return (
+              <li key={index}>
+                {address && (
+                  <Link href={`/goals/${goalId}`}>
+                    <GoalSummary goalId={goalId} />
+                  </Link>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </>

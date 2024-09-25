@@ -16,7 +16,7 @@ const Home: NextPage = () => {
 
       <GoalForm />
 
-      {!isLoadingAddress && <GoalsList address={address} />}
+      {!isLoadingAddress && address && <GoalsList address={address} />}
     </div>
   );
 };

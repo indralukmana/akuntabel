@@ -1,11 +1,10 @@
-import { Address as AddressType } from "viem";
+"use client";
+
+import { Hex } from "viem";
 import { Address } from "~~/components/scaffold-eth/Address";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
-import { generateGoalId } from "~~/utils/akuntabel/generateGoalId";
 
-export const GoalDetails = ({ goalNonce, address }: { goalNonce: bigint; address: AddressType }) => {
-  const goalId = generateGoalId(address, goalNonce);
-
+export const GoalDetails = ({ goalId }: { goalId: Hex }) => {
   const { data: goalDetails } = useScaffoldReadContract({
     contractName: "Akuntabel",
     functionName: "getGoalDetails",
@@ -24,34 +23,40 @@ export const GoalDetails = ({ goalNonce, address }: { goalNonce: bigint; address
 
   return (
     <div className="bg-base-200 p-4 rounded-lg border border-base-content">
-      <h3 className="text-lg font-semibold mb-2">Goal Details</h3>
-      <p>
-        <strong>Description:</strong> {description}
-      </p>
-      <p>
-        <strong>User:</strong> <Address address={user} />
-      </p>
-      <p>
-        <strong>Stake:</strong> {stake.toString()} wei
-      </p>
-      <p>
+      <div>
+        <p>
+          <strong>Description:</strong> {description}
+        </p>
+        <p>
+          <strong>Completed:</strong> {completed ? "Yes" : "No"}
+        </p>
+        <p>
+          <strong>Funds Released:</strong> {fundsReleased ? "Yes" : "No"}
+        </p>
+      </div>
+      <div>
+        <p>
+          <strong>User:</strong> <Address address={user} />
+        </p>
+        <p>
+          <strong>Stake:</strong> {stake.toString()} wei
+        </p>
+      </div>
+      <section>
         <strong>Judges:</strong>{" "}
         {judges.map((judge, index) => (
           <Address key={index} address={judge} />
         ))}
-      </p>
-      <p>
-        <strong>Required Approvals:</strong> {requiredApprovals.toString()}
-      </p>
-      <p>
-        <strong>Current Approvals:</strong> {currentApprovals.toString()}
-      </p>
-      <p>
-        <strong>Completed:</strong> {completed ? "Yes" : "No"}
-      </p>
-      <p>
-        <strong>Funds Released:</strong> {fundsReleased ? "Yes" : "No"}
-      </p>
+      </section>
+      <div>
+        <p>
+          <strong>Required Approvals:</strong> {requiredApprovals.toString()}
+        </p>
+        <p>
+          <strong>Current Approvals:</strong> {currentApprovals.toString()}
+        </p>
+      </div>
+
       {goalMilestones && (
         <div>
           <h4 className="text-md font-semibold mt-2">Milestones</h4>
