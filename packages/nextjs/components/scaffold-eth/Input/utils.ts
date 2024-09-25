@@ -2,6 +2,7 @@ export type CommonInputProps<T = string> = {
   value: T;
   onChange: (newValue: T) => void;
   name?: string;
+  label?: string;
   placeholder?: string;
   disabled?: boolean;
 };

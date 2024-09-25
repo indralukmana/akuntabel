@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Akuntabel: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
       abi: [
         {
           inputs: [],
@@ -19,9 +19,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "goalId",
-              type: "uint256",
+              type: "bytes32",
             },
             {
               indexed: true,
@@ -44,9 +44,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "goalId",
-              type: "uint256",
+              type: "bytes32",
             },
             {
               indexed: true,
@@ -63,9 +63,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "goalId",
-              type: "uint256",
+              type: "bytes32",
             },
           ],
           name: "GoalCompleted",
@@ -76,9 +76,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "goalId",
-              type: "uint256",
+              type: "bytes32",
             },
             {
               indexed: true,
@@ -107,9 +107,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "goalId",
-              type: "uint256",
+              type: "bytes32",
             },
             {
               indexed: true,
@@ -126,9 +126,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "goalId",
-              type: "uint256",
+              type: "bytes32",
             },
             {
               indexed: false,
@@ -145,9 +145,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "goalId",
-              type: "uint256",
+              type: "bytes32",
             },
             {
               indexed: false,
@@ -170,9 +170,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "goalId",
-              type: "uint256",
+              type: "bytes32",
             },
             {
               indexed: false,
@@ -273,24 +273,11 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
-          name: "JUDGE_ROLE",
-          outputs: [
-            {
-              internalType: "bytes32",
-              name: "",
-              type: "bytes32",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "_goalId",
-              type: "uint256",
+              type: "bytes32",
             },
             {
               internalType: "uint256",
@@ -306,9 +293,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "_goalId",
-              type: "uint256",
+              type: "bytes32",
             },
           ],
           name: "approveGoal",
@@ -347,9 +334,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "_goalId",
-              type: "uint256",
+              type: "bytes32",
             },
           ],
           name: "getGoalDetails",
@@ -401,9 +388,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "_goalId",
-              type: "uint256",
+              type: "bytes32",
             },
           ],
           name: "getGoalMilestones",
@@ -444,9 +431,28 @@ const deployedContracts = {
         {
           inputs: [
             {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "goalNonce",
+          outputs: [
+            {
               internalType: "uint256",
               name: "",
               type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
             },
           ],
           name: "goals",
@@ -527,19 +533,6 @@ const deployedContracts = {
               internalType: "bool",
               name: "",
               type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "nextGoalId",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
             },
           ],
           stateMutability: "view",

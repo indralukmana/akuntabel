@@ -9,7 +9,8 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
  * @dev A decentralized accountability contract for setting and achieving personal goals with milestones
  */
 contract Akuntabel is ReentrancyGuard, AccessControl {
-    bytes32 public constant JUDGE_ROLE = keccak256("JUDGE_ROLE");
+    bytes32 private constant JUDGE_ROLE = keccak256("JUDGE_ROLE");
+    bytes32 private constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
     /**
      * Milestone struct to store the description 
@@ -37,20 +38,20 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         Milestone[] milestones;
     }
 
-    mapping(uint256 => Goal) public goals;
-    uint256 public nextGoalId;
+    mapping(bytes32 => Goal) public goals;
+    mapping(address => uint256) public goalNonce;
 
-    event GoalCreated(uint256 indexed goalId, address indexed user, string description, uint256 stake);
-    event MilestoneAdded(uint256 indexed goalId, uint256 milestoneIndex, string description);
-    event MilestoneAchieved(uint256 indexed goalId, uint256 milestoneIndex);
-    event JudgeInvited(uint256 indexed goalId, address indexed judge);
-    event GoalApproved(uint256 indexed goalId, address indexed judge);
-    event GoalCompleted(uint256 indexed goalId);
-    event FundsReleased(uint256 indexed goalId, address indexed user, uint256 amount);
-    event RequiredApprovalsSet(uint256 indexed goalId, uint256 requiredApprovals);
+    event GoalCreated(bytes32 indexed goalId, address indexed user, string description, uint256 stake);
+    event MilestoneAdded(bytes32 indexed goalId, uint256 milestoneIndex, string description);
+    event MilestoneAchieved(bytes32 indexed goalId, uint256 milestoneIndex);
+    event JudgeInvited(bytes32 indexed goalId, address indexed judge);
+    event GoalApproved(bytes32 indexed goalId, address indexed judge);
+    event GoalCompleted(bytes32 indexed goalId);
+    event FundsReleased(bytes32 indexed goalId, address indexed user, uint256 amount);
+    event RequiredApprovalsSet(bytes32 indexed goalId, uint256 requiredApprovals);
 
     constructor() {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     /**
@@ -71,7 +72,8 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         require(_milestoneDescriptions.length > 0, "At least one milestone is required");
         require(_requiredApprovals > 0 && _requiredApprovals <= _judges.length, "Invalid number of required approvals");
 
-        uint256 goalId = nextGoalId++;
+        bytes32 goalId = keccak256(abi.encodePacked(msg.sender, goalNonce[msg.sender]++));
+
         Goal storage newGoal = goals[goalId];
         newGoal.user = msg.sender;
         newGoal.description = _description;
@@ -96,7 +98,7 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         emit RequiredApprovalsSet(goalId, _requiredApprovals);
     }
 
-    function achieveMilestone(uint256 _goalId, uint256 _milestoneIndex) external {
+    function achieveMilestone(bytes32 _goalId, uint256 _milestoneIndex) external {
         Goal storage goal = goals[_goalId];
         require(msg.sender == goal.user, "Only goal creator can achieve milestones");
         require(_milestoneIndex < goal.milestones.length, "Invalid milestone index");
@@ -111,7 +113,7 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         }
     }
 
-    function approveGoal(uint256 _goalId) external {
+    function approveGoal(bytes32 _goalId) external {
         require(hasRole(JUDGE_ROLE, msg.sender), "Caller is not a judge");
         Goal storage goal = goals[_goalId];
         require(goal.completed, "All milestones must be achieved before approval");
@@ -127,7 +129,7 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         }
     }
 
-    function areAllMilestonesAchieved(uint256 _goalId) internal view returns (bool) {
+    function areAllMilestonesAchieved(bytes32 _goalId) internal view returns (bool) {
         Goal storage goal = goals[_goalId];
         for (uint256 i = 0; i < goal.milestones.length; i++) {
             if (!goal.milestones[i].achieved) {
@@ -137,7 +139,7 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         return true;
     }
 
-    function releaseFunds(uint256 _goalId) internal {
+    function releaseFunds(bytes32 _goalId) internal {
         Goal storage goal = goals[_goalId];
         require(goal.completed, "Goal not completed");
         require(!goal.fundsReleased, "Funds already released");
@@ -152,7 +154,7 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         payable(msg.sender).transfer(_amount);
     }
 
-    function getGoalMilestones(uint256 _goalId) external view returns (
+    function getGoalMilestones(bytes32 _goalId) external view returns (
         string[] memory descriptions,
         bool[] memory achieved
     ) {
@@ -168,7 +170,7 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         }
     }
 
-    function getGoalDetails(uint256 _goalId) external view returns (
+    function getGoalDetails(bytes32 _goalId) external view returns (
         address user,
         string memory description,
         uint256 stake,
