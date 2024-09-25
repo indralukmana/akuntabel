@@ -48,7 +48,7 @@ export const InputBase = <T extends { toString: () => string } | undefined = str
   }, [reFocus]);
 
   return (
-    <>
+    <div className="w-full">
       <label htmlFor={name}>{label ?? name}</label>
       <div className={`flex border-2 border-base-300 bg-base-200 rounded-full text-accent ${modifier}`}>
         {prefix}
@@ -65,6 +65,6 @@ export const InputBase = <T extends { toString: () => string } | undefined = str
         />
         {suffix}
       </div>
-    </>
+    </div>
   );
 };
