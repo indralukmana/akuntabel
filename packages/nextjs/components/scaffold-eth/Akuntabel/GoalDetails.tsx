@@ -1,10 +1,13 @@
 "use client";
 
+import { GoalOverview } from "./GoalOverview";
 import { Hex } from "viem";
-import { Address } from "~~/components/scaffold-eth/Address";
+import { GoalMilestones } from "~~/components/scaffold-eth/Akuntabel/GoalMilestones";
+import { GoalStake } from "~~/components/scaffold-eth/Akuntabel/GoalStake";
+import { JudgesAndApprovals } from "~~/components/scaffold-eth/Akuntabel/JudgesAndApprovals";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
-export const GoalDetails = ({ goalId }: { goalId: Hex }) => {
+export function GoalDetails({ goalId }: { goalId: Hex }) {
   const { data: goalDetails } = useScaffoldReadContract({
     contractName: "Akuntabel",
     functionName: "getGoalDetails",
@@ -22,53 +25,24 @@ export const GoalDetails = ({ goalId }: { goalId: Hex }) => {
   const [user, description, stake, judges, requiredApprovals, currentApprovals, completed, fundsReleased] = goalDetails;
 
   return (
-    <div className="bg-base-200 p-4 rounded-lg border border-base-content">
+    <div className="bg-base-200 p-4 rounded-lg border border-base-content grid grid-cols-[max-content_max-content_1fr] divide-x-2 items-start gap-4 h-full">
       <div>
-        <p>
-          <strong>Description:</strong> {description}
-        </p>
-        <p>
-          <strong>Completed:</strong> {completed ? "Yes" : "No"}
-        </p>
-        <p>
-          <strong>Funds Released:</strong> {fundsReleased ? "Yes" : "No"}
-        </p>
+        <h4 className="text-md font-semibold underline">Goal Overview</h4>
+        <GoalOverview description={description} completed={completed} fundsReleased={fundsReleased} />
+        <GoalStake user={user} stake={stake} />
       </div>
-      <div>
-        <p>
-          <strong>User:</strong> <Address address={user} />
-        </p>
-        <p>
-          <strong>Stake:</strong> {stake.toString()} wei
-        </p>
-      </div>
-      <section>
-        <strong>Judges:</strong>{" "}
-        {judges.map((judge, index) => (
-          <Address key={index} address={judge} />
-        ))}
-      </section>
-      <div>
-        <p>
-          <strong>Required Approvals:</strong> {requiredApprovals.toString()}
-        </p>
-        <p>
-          <strong>Current Approvals:</strong> {currentApprovals.toString()}
-        </p>
-      </div>
-
+      <JudgesAndApprovals
+        judges={judges as string[]}
+        requiredApprovals={requiredApprovals}
+        currentApprovals={currentApprovals}
+      />
       {goalMilestones && (
-        <div>
-          <h4 className="text-md font-semibold mt-2">Milestones</h4>
-          <ul>
-            {goalMilestones[0].map((description, index) => (
-              <li key={index}>
-                {description} - {goalMilestones[1][index] ? "Achieved" : "Not Achieved"}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <GoalMilestones
+          description={description}
+          milestones={goalMilestones as [string[], boolean[]]}
+          goalId={goalId}
+        />
       )}
     </div>
   );
-};
+}
