@@ -29,7 +29,7 @@ export function GoalDetails({ goalId }: { goalId: Hex }) {
   } = goalDetails;
 
   return (
-    <div className="bg-base-200 p-4 rounded-lg border border-base-content grid grid-cols-[max-content_max-content_1fr] divide-x-2 items-start gap-4 h-full">
+    <div className="bg-base-200 p-4 rounded-lg border border-base-content grid grid-cols-[max-content_max-content_1fr] divide-x-2 items-start gap-4">
       <div>
         <h4 className="text-md font-semibold underline">Goal Overview</h4>
         <GoalOverview description={description} completed={completed} fundsReleased={fundsReleased} />

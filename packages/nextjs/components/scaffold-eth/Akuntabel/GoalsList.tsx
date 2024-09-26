@@ -52,7 +52,7 @@ export const GoalsList = ({ address }: { address: AddressType }) => {
   });
   return (
     <>
-      <div className="mt-4">
+      <div className="mt-8">
         <h2 className="text-xl font-semibold mb-2">Your Account</h2>
         <div className="flex items-center gap-2">
           <p>Address:</p>
@@ -61,7 +61,7 @@ export const GoalsList = ({ address }: { address: AddressType }) => {
         <p>Goal Nonce: {Number(goalNonce)}</p>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-10">
         <h2 className="text-xl font-semibold mb-2">All Goals</h2>
         <ul className="space-y-4">
           {Array.from({ length: Number(goalNonce) }).map((_, index) => {

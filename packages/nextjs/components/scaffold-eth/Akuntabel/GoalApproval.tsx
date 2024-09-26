@@ -51,7 +51,7 @@ const GoalApproval = ({ goalId }: GoalApprovalProps) => {
     args: [goalId],
   });
 
-  if (!goalDetails) return <p>Loading goal details...</p>;
+  if (!goalDetails) return null;
 
   const { description, judges, approvals, completed } = goalDetails;
 

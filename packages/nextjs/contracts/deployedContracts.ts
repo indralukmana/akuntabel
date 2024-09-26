@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Akuntabel: {
-      address: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       abi: [
         {
           inputs: [],
@@ -409,30 +409,6 @@ const deployedContracts = {
               internalType: "struct Akuntabel.Goal",
               name: "",
               type: "tuple",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "bytes32",
-              name: "_goalId",
-              type: "bytes32",
-            },
-          ],
-          name: "getGoalMilestones",
-          outputs: [
-            {
-              internalType: "string[]",
-              name: "descriptions",
-              type: "string[]",
-            },
-            {
-              internalType: "bool[]",
-              name: "achieved",
-              type: "bool[]",
             },
           ],
           stateMutability: "view",
