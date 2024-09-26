@@ -2,18 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { Address as AddressType, Hex, formatEther } from "viem";
+import { Address as AddressType, formatEther } from "viem";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { Address } from "~~/components/scaffold-eth";
+import { useGoalDetails } from "~~/hooks/akuntabel/useGoalDetails";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
-import { generateGoalId } from "~~/utils/akuntabel/generateGoalId";
 
-const GoalSummary = ({ goalId }: { goalId: Hex }) => {
-  const { data: goalDetails } = useScaffoldReadContract({
-    contractName: "Akuntabel",
-    functionName: "getGoalDetails",
-    args: [goalId],
-  });
+const GoalSummary = ({ goalId }: { goalId: bigint }) => {
+  const { goalDetails } = useGoalDetails(goalId);
 
   if (!goalDetails) return null;
 
@@ -23,7 +19,7 @@ const GoalSummary = ({ goalId }: { goalId: Hex }) => {
     <div className="grid grid-rows-4 md:grid-rows-1 grid-cols-1 md:grid-cols-4 border border-base-content p-4 rounded-lg items-center">
       <div>
         <p>Description: {description}</p>
-        <p>Stake: {formatEther(stake)} ETH</p>
+        <p>Stake: {stake ? formatEther(stake) : ""} ETH</p>
       </div>
       <div>
         <p>Required Approvals: {Number(requiredApprovals)}</p>
@@ -65,7 +61,8 @@ export const GoalsList = ({ address }: { address: AddressType }) => {
         <h2 className="text-xl font-semibold mb-2">All Goals</h2>
         <ul className="space-y-4">
           {Array.from({ length: Number(goalNonce) }).map((_, index) => {
-            const goalId = generateGoalId(address, BigInt(index));
+            const goalId = BigInt(index);
+
             return (
               <li key={index}>
                 {address && (

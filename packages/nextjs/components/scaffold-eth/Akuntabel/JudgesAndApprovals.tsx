@@ -5,7 +5,7 @@ export function JudgesAndApprovals({
   requiredApprovals,
   currentApprovals,
 }: {
-  judges: string[];
+  judges: readonly string[] | undefined;
   requiredApprovals: bigint;
   currentApprovals: bigint;
 }) {
@@ -21,7 +21,7 @@ export function JudgesAndApprovals({
         </p>
       </div>
       <strong>Judges:</strong>{" "}
-      {judges.map((judge, index) => (
+      {judges?.map((judge, index) => (
         <Address key={index} address={judge} />
       ))}
     </section>

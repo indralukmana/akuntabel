@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Akuntabel: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
       abi: [
         {
           inputs: [],
@@ -19,9 +19,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "goalId",
-              type: "bytes32",
+              type: "uint256",
             },
             {
               indexed: true,
@@ -44,9 +44,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "goalId",
-              type: "bytes32",
+              type: "uint256",
             },
             {
               indexed: true,
@@ -63,9 +63,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "goalId",
-              type: "bytes32",
+              type: "uint256",
             },
           ],
           name: "GoalCompleted",
@@ -76,9 +76,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "goalId",
-              type: "bytes32",
+              type: "uint256",
             },
             {
               indexed: true,
@@ -107,9 +107,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "goalId",
-              type: "bytes32",
+              type: "uint256",
             },
             {
               indexed: true,
@@ -126,9 +126,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "goalId",
-              type: "bytes32",
+              type: "uint256",
             },
             {
               indexed: false,
@@ -145,9 +145,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "goalId",
-              type: "bytes32",
+              type: "uint256",
             },
             {
               indexed: false,
@@ -170,9 +170,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "goalId",
-              type: "bytes32",
+              type: "uint256",
             },
             {
               indexed: false,
@@ -275,9 +275,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "_goalId",
-              type: "bytes32",
+              type: "uint256",
             },
             {
               internalType: "uint256",
@@ -293,9 +293,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "_goalId",
-              type: "bytes32",
+              type: "uint256",
             },
           ],
           name: "approveGoal",
@@ -321,9 +321,9 @@ const deployedContracts = {
               type: "string[]",
             },
             {
-              internalType: "uint256",
+              internalType: "uint8",
               name: "_requiredApprovals",
-              type: "uint256",
+              type: "uint8",
             },
           ],
           name: "createGoal",
@@ -334,81 +334,67 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "_goalId",
-              type: "bytes32",
+              type: "uint256",
             },
           ],
           name: "getGoalDetails",
           outputs: [
             {
-              components: [
-                {
-                  internalType: "address",
-                  name: "user",
-                  type: "address",
-                },
-                {
-                  internalType: "string",
-                  name: "description",
-                  type: "string",
-                },
-                {
-                  internalType: "uint256",
-                  name: "stake",
-                  type: "uint256",
-                },
-                {
-                  internalType: "address[]",
-                  name: "judges",
-                  type: "address[]",
-                },
-                {
-                  internalType: "address[]",
-                  name: "approvals",
-                  type: "address[]",
-                },
-                {
-                  internalType: "uint256",
-                  name: "requiredApprovals",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "currentApprovals",
-                  type: "uint256",
-                },
-                {
-                  internalType: "bool",
-                  name: "completed",
-                  type: "bool",
-                },
-                {
-                  internalType: "bool",
-                  name: "fundsReleased",
-                  type: "bool",
-                },
-                {
-                  components: [
-                    {
-                      internalType: "string",
-                      name: "description",
-                      type: "string",
-                    },
-                    {
-                      internalType: "bool",
-                      name: "achieved",
-                      type: "bool",
-                    },
-                  ],
-                  internalType: "struct Akuntabel.Milestone[]",
-                  name: "milestones",
-                  type: "tuple[]",
-                },
-              ],
-              internalType: "struct Akuntabel.Goal",
-              name: "",
-              type: "tuple",
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "description",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "stake",
+              type: "uint256",
+            },
+            {
+              internalType: "address[]",
+              name: "judges",
+              type: "address[]",
+            },
+            {
+              internalType: "uint8",
+              name: "requiredApprovals",
+              type: "uint8",
+            },
+            {
+              internalType: "uint8",
+              name: "currentApprovals",
+              type: "uint8",
+            },
+            {
+              internalType: "bool[]",
+              name: "verifiedApprovals",
+              type: "bool[]",
+            },
+            {
+              internalType: "string[]",
+              name: "milestoneDescriptions",
+              type: "string[]",
+            },
+            {
+              internalType: "bool[]",
+              name: "milestoneAchieved",
+              type: "bool[]",
+            },
+            {
+              internalType: "bool",
+              name: "completed",
+              type: "bool",
+            },
+            {
+              internalType: "bool",
+              name: "fundsReleased",
+              type: "bool",
             },
           ],
           stateMutability: "view",
@@ -455,9 +441,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "bytes32",
+              internalType: "uint256",
               name: "",
-              type: "bytes32",
+              type: "uint256",
             },
           ],
           name: "goals",
@@ -478,14 +464,14 @@ const deployedContracts = {
               type: "uint256",
             },
             {
-              internalType: "uint256",
+              internalType: "uint8",
               name: "requiredApprovals",
-              type: "uint256",
+              type: "uint8",
             },
             {
-              internalType: "uint256",
+              internalType: "uint8",
               name: "currentApprovals",
-              type: "uint256",
+              type: "uint8",
             },
             {
               internalType: "bool",

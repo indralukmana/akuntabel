@@ -6,12 +6,12 @@ export function GoalStake({ user, stake }: { user: string; stake: bigint }) {
 
   return (
     <section>
-      <p>
+      <span>
         <strong>User:</strong> <Address address={user} />
-      </p>
-      <p>
+      </span>
+      <span>
         <strong>Stake:</strong> {stakeInEth} ETH
-      </p>
+      </span>
     </section>
   );
 }

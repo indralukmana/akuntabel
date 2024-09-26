@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import { Hex } from "viem";
 import { useAccount } from "wagmi";
-import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useGoalDetails } from "~~/hooks/akuntabel/useGoalDetails";
+import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 type ApprovalModalProps = {
   description: string;
@@ -37,7 +37,7 @@ const ApprovalModal = ({ description, handleApproveGoal, modalRef }: ApprovalMod
 };
 
 type GoalApprovalProps = {
-  goalId: Hex;
+  goalId: bigint;
 };
 
 const GoalApproval = ({ goalId }: GoalApprovalProps) => {
@@ -45,21 +45,17 @@ const GoalApproval = ({ goalId }: GoalApprovalProps) => {
   const { address } = useAccount();
   const { writeContractAsync: approveGoal } = useScaffoldWriteContract("Akuntabel");
 
-  const { data: goalDetails } = useScaffoldReadContract({
-    contractName: "Akuntabel",
-    functionName: "getGoalDetails",
-    args: [goalId],
-  });
+  const { goalDetails, isLoading } = useGoalDetails(goalId);
 
-  if (!goalDetails) return null;
+  if (isLoading) return <p>Loading goal details...</p>;
 
-  const { description, judges, approvals, completed } = goalDetails;
+  const { description, judges, verifiedApprovals, completed } = goalDetails;
 
   if (!address) return <p>Loading address...</p>;
 
-  const judgeIndex = judges.findIndex(judge => judge === address);
+  const judgeIndex = judges?.findIndex(judge => judge === address);
   const isJudge = judgeIndex !== -1;
-  const alreadyApproved = approvals.includes(address);
+  const alreadyApproved = judgeIndex !== undefined && verifiedApprovals?.[judgeIndex];
 
   if (!isJudge) return null;
 
@@ -97,7 +93,7 @@ const GoalApproval = ({ goalId }: GoalApprovalProps) => {
       <button className="btn btn-primary" onClick={openModal} disabled={!completed}>
         Approve Goal
       </button>
-      <ApprovalModal description={description} handleApproveGoal={handleApproveGoal} modalRef={modalRef} />
+      <ApprovalModal description={description ?? ""} handleApproveGoal={handleApproveGoal} modalRef={modalRef} />
     </section>
   );
 };

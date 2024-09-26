@@ -1,20 +1,15 @@
 "use client";
 
 import { GoalOverview } from "./GoalOverview";
-import { Hex } from "viem";
 import { GoalMilestones } from "~~/components/scaffold-eth/Akuntabel/GoalMilestones";
 import { GoalStake } from "~~/components/scaffold-eth/Akuntabel/GoalStake";
 import { JudgesAndApprovals } from "~~/components/scaffold-eth/Akuntabel/JudgesAndApprovals";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useGoalDetails } from "~~/hooks/akuntabel/useGoalDetails";
 
-export function GoalDetails({ goalId }: { goalId: Hex }) {
-  const { data: goalDetails } = useScaffoldReadContract({
-    contractName: "Akuntabel",
-    functionName: "getGoalDetails",
-    args: [goalId],
-  });
+export function GoalDetails({ goalId }: { goalId: bigint }) {
+  const { goalDetails, isLoading } = useGoalDetails(goalId);
 
-  if (!goalDetails) return <p>Loading goal details...</p>;
+  if (isLoading) return <p>Loading goal details...</p>;
 
   const {
     user,
@@ -25,24 +20,30 @@ export function GoalDetails({ goalId }: { goalId: Hex }) {
     currentApprovals,
     completed,
     fundsReleased,
-    milestones,
+    milestoneDescriptions,
+    milestoneAchieved,
   } = goalDetails;
 
   return (
     <div className="bg-base-200 p-4 rounded-lg border border-base-content grid grid-cols-[max-content_max-content_1fr] divide-x-2 items-start gap-4">
       <div>
         <h4 className="text-md font-semibold underline">Goal Overview</h4>
-        <GoalOverview description={description} completed={completed} fundsReleased={fundsReleased} />
-        <GoalStake user={user} stake={stake} />
+        <GoalOverview
+          description={description ?? ""}
+          completed={completed ?? false}
+          fundsReleased={fundsReleased ?? false}
+        />
+        <GoalStake user={user ?? ""} stake={BigInt(stake ?? 0)} />
       </div>
       <JudgesAndApprovals
-        judges={judges as string[]}
-        requiredApprovals={requiredApprovals}
-        currentApprovals={currentApprovals}
+        judges={judges}
+        requiredApprovals={BigInt(requiredApprovals ?? 0)}
+        currentApprovals={BigInt(currentApprovals ?? 0)}
       />
       <GoalMilestones
-        goalDescription={description}
-        milestones={milestones as { description: string; achieved: boolean }[]}
+        goalDescription={description ?? ""}
+        milestonesDescriptions={milestoneDescriptions}
+        milestonesAchieved={milestoneAchieved}
         goalId={goalId}
       />
     </div>

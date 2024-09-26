@@ -22,7 +22,7 @@ export const GoalForm = () => {
     try {
       await writeContractAsync({
         functionName: "createGoal",
-        args: [description, judges, milestones, BigInt(requiredApprovals)],
+        args: [description, judges, milestones, requiredApprovals],
         value: parseEther(stake),
       });
       alert("Goal created successfully!");

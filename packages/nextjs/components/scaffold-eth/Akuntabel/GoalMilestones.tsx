@@ -1,22 +1,25 @@
 "use client";
 
 import { useRef } from "react";
-import { Hex } from "viem";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 type MilestoneModalProps = {
   goalDescription: string;
   milestoneDescription: string;
-  handleFinishMilestone: () => Promise<void>;
+  onConfirm: () => Promise<void>;
 };
 
-const MilestoneModal = ({ goalDescription, milestoneDescription, handleFinishMilestone }: MilestoneModalProps) => {
+const MilestoneModal = ({ goalDescription, milestoneDescription, onConfirm }: MilestoneModalProps) => {
   const modalRef = useRef<HTMLDialogElement>(null);
   const openModal = () => {
     modalRef.current?.showModal();
   };
 
-  console.log({ goalDescription, milestoneDescription });
+  const handleConfirm = async () => {
+    await onConfirm();
+    modalRef.current?.close();
+  };
+
   return (
     <>
       <dialog id="finish_milestone_modal" className="modal" ref={modalRef}>
@@ -33,7 +36,7 @@ const MilestoneModal = ({ goalDescription, milestoneDescription, handleFinishMil
             <form method="dialog">
               <button className="btn btn-outline mr-2">Cancel</button>
             </form>
-            <button className="btn btn-primary" onClick={handleFinishMilestone}>
+            <button className="btn btn-primary" onClick={() => handleConfirm()}>
               Confirm
             </button>
           </div>
@@ -51,11 +54,17 @@ const MilestoneModal = ({ goalDescription, milestoneDescription, handleFinishMil
 
 interface GoalMilestonesProps {
   goalDescription: string;
-  milestones: { description: string; achieved: boolean }[];
-  goalId: Hex;
+  milestonesDescriptions: readonly string[] | undefined;
+  milestonesAchieved: readonly boolean[] | undefined;
+  goalId: bigint;
 }
 
-export function GoalMilestones({ goalDescription, milestones, goalId }: GoalMilestonesProps) {
+export function GoalMilestones({
+  goalDescription,
+  milestonesDescriptions,
+  milestonesAchieved,
+  goalId,
+}: GoalMilestonesProps) {
   const { writeContractAsync: finishMilestone } = useScaffoldWriteContract("Akuntabel");
 
   const handleFinishMilestone = async (index: number) => {
@@ -73,9 +82,8 @@ export function GoalMilestones({ goalDescription, milestones, goalId }: GoalMile
     <section className="h-full pl-4">
       <h4 className="text-md font-semibold underline">Milestones</h4>
       <ol className="list-decimal">
-        {milestones.map((milestone, index) => {
-          const { description, achieved } = milestone;
-          console.log({ milestone });
+        {milestonesDescriptions?.map((description, index) => {
+          const achieved = milestonesAchieved?.[index];
           return (
             <li key={index + description} className="flex flex-col gap-2">
               <span>
@@ -86,7 +94,7 @@ export function GoalMilestones({ goalDescription, milestones, goalId }: GoalMile
                   <MilestoneModal
                     goalDescription={goalDescription}
                     milestoneDescription={description}
-                    handleFinishMilestone={async () => await handleFinishMilestone(index)}
+                    onConfirm={async () => await handleFinishMilestone(index)}
                   />
                 </>
               )}

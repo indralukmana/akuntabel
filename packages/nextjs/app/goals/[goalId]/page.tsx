@@ -1,10 +1,9 @@
 import type { NextPage } from "next";
-import { Hex } from "viem";
 import GoalApproval from "~~/components/scaffold-eth/Akuntabel/GoalApproval";
 import { GoalDetails } from "~~/components/scaffold-eth/Akuntabel/GoalDetails";
 
 type GoalPageProps = {
-  params: { goalId: Hex };
+  params: { goalId: bigint };
 };
 
 const GoalPage: NextPage<GoalPageProps> = ({ params }) => {
