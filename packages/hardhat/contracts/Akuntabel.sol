@@ -30,9 +30,9 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         string description;
         uint256 stake;
         address[] judges;
+        address[] approvals;
         uint256 requiredApprovals;
         uint256 currentApprovals;
-        mapping(address => bool) judgeApprovals;
         bool completed;
         bool fundsReleased;
         Milestone[] milestones;
@@ -118,15 +118,26 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         Goal storage goal = goals[_goalId];
         require(goal.completed, "All milestones must be achieved before approval");
         require(!goal.fundsReleased, "Funds already released");
-        require(!goal.judgeApprovals[msg.sender], "Judge has already approved");
+        require(!judgeHasApproved(_goalId, msg.sender), "Judge has already approved");
 
-        goal.judgeApprovals[msg.sender] = true;
+        goal.approvals.push(msg.sender);
         goal.currentApprovals++;
         emit GoalApproved(_goalId, msg.sender);
 
         if (goal.currentApprovals >= goal.requiredApprovals) {
             releaseFunds(_goalId);
         }
+    }
+
+    function judgeHasApproved(bytes32 _goalId, address _judge) internal view returns (bool) {
+        Goal storage goal = goals[_goalId];
+        
+        for (uint256 i = 0; i < goal.approvals.length; i++) {
+            if (goal.approvals[i] == _judge) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function areAllMilestonesAchieved(bytes32 _goalId) internal view returns (bool) {
@@ -154,42 +165,19 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         payable(msg.sender).transfer(_amount);
     }
 
-    function getGoalMilestones(bytes32 _goalId) external view returns (
-        string[] memory descriptions,
-        bool[] memory achieved
-    ) {
+    function getGoalDetails(bytes32 _goalId) external view returns (Goal memory) {
         Goal storage goal = goals[_goalId];
-        uint256 milestoneCount = goal.milestones.length;
-        
-        descriptions = new string[](milestoneCount);
-        achieved = new bool[](milestoneCount);
-        
-        for (uint256 i = 0; i < milestoneCount; i++) {
-            descriptions[i] = goal.milestones[i].description;
-            achieved[i] = goal.milestones[i].achieved;
-        }
-    }
-
-    function getGoalDetails(bytes32 _goalId) external view returns (
-        address user,
-        string memory description,
-        uint256 stake,
-        address[] memory judges,
-        uint256 requiredApprovals,
-        uint256 currentApprovals,
-        bool completed,
-        bool fundsReleased
-    ) {
-        Goal storage goal = goals[_goalId];
-        return (
-            goal.user,
+        return Goal(
+            goal.user, 
             goal.description,
             goal.stake,
             goal.judges,
+            goal.approvals,
             goal.requiredApprovals,
             goal.currentApprovals,
             goal.completed,
-            goal.fundsReleased
+            goal.fundsReleased,
+            goal.milestones
         );
     }
 }
