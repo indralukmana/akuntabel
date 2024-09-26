@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { Hex } from "viem";
+import GoalApproval from "~~/components/scaffold-eth/Akuntabel/GoalApproval";
 import { GoalDetails } from "~~/components/scaffold-eth/Akuntabel/GoalDetails";
 
 type GoalPageProps = {
@@ -9,8 +10,9 @@ type GoalPageProps = {
 const GoalPage: NextPage<GoalPageProps> = ({ params }) => {
   const { goalId } = params;
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Goal Details</h1>
+    <div className="container mx-auto p-4 space-y-8">
+      <h1 className="text-2xl font-bold ">Goal Details</h1>
+      <GoalApproval goalId={goalId} />
       <GoalDetails goalId={goalId} />
     </div>
   );

@@ -71,7 +71,7 @@ export const GoalForm = () => {
   }
 
   return (
-    <div className="mb-4 space-y-6">
+    <section className="mb-4 space-y-6 border border-base-content rounded-xl p-4">
       <h2 className="text-xl font-semibold mb-2">Create New Goal</h2>
 
       <div className="space-y-4">
@@ -149,6 +149,6 @@ export const GoalForm = () => {
       <button onClick={handleCreateGoal} className="btn btn-primary ">
         Create Goal
       </button>
-    </div>
+    </section>
   );
 };

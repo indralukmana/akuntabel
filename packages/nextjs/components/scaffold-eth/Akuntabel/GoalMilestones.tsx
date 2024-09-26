@@ -5,76 +5,67 @@ import { Hex } from "viem";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 type MilestoneModalProps = {
-  description: string;
-  milestone: string;
-  selectedMilestoneRef: React.RefObject<number | null>;
-  handleFinishMilestone: () => void;
-  modalRef: React.RefObject<HTMLDialogElement>;
+  goalDescription: string;
+  milestoneDescription: string;
+  handleFinishMilestone: () => Promise<void>;
 };
 
-const MilestoneModal = ({
-  description,
-  milestone,
-  selectedMilestoneRef,
-  handleFinishMilestone,
-  modalRef,
-}: MilestoneModalProps) => {
+const MilestoneModal = ({ goalDescription, milestoneDescription, handleFinishMilestone }: MilestoneModalProps) => {
+  const modalRef = useRef<HTMLDialogElement>(null);
+  const openModal = () => {
+    modalRef.current?.showModal();
+  };
+
+  console.log({ goalDescription, milestoneDescription });
   return (
-    <dialog id="finish_milestone_modal" className="modal" ref={modalRef}>
-      <div className="modal-box">
-        <h3 className="font-bold text-lg">Confirm Milestone Completion</h3>
-        <p className="py-2">
-          <strong>Goal:</strong> {description}
-        </p>
-        {selectedMilestoneRef.current !== null && (
+    <>
+      <dialog id="finish_milestone_modal" className="modal" ref={modalRef}>
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Confirm Milestone Completion</h3>
           <p className="py-2">
-            <strong>Milestone:</strong> {milestone}
+            <strong>Goal:</strong> {goalDescription}
           </p>
-        )}
-        <p className="py-4">Are you sure you want to mark this milestone as finished?</p>
-        <div className="modal-action">
-          <form method="dialog">
-            <button className="btn btn-outline mr-2">Cancel</button>
-          </form>
-          <button className="btn btn-primary" onClick={handleFinishMilestone}>
-            Confirm
-          </button>
+          <p className="py-2">
+            <strong>Milestone:</strong> {milestoneDescription}
+          </p>
+          <p className="py-4">Are you sure you want to mark this milestone as finished?</p>
+          <div className="modal-action">
+            <form method="dialog">
+              <button className="btn btn-outline mr-2">Cancel</button>
+            </form>
+            <button className="btn btn-primary" onClick={handleFinishMilestone}>
+              Confirm
+            </button>
+          </div>
         </div>
-      </div>
-      <form method="dialog" className="modal-backdrop">
-        <button>close</button>
-      </form>
-    </dialog>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+      <button className="btn btn-sm w-fit btn-primary" onClick={() => openModal()}>
+        Finish
+      </button>
+    </>
   );
 };
 
 interface GoalMilestonesProps {
-  description: string;
-  milestones: [string[], boolean[]];
+  goalDescription: string;
+  milestones: { description: string; achieved: boolean }[];
   goalId: Hex;
 }
 
-export function GoalMilestones({ description, milestones, goalId }: GoalMilestonesProps) {
-  const modalRef = useRef<HTMLDialogElement>(null);
-  const selectedMilestoneRef = useRef<number | null>(null);
+export function GoalMilestones({ goalDescription, milestones, goalId }: GoalMilestonesProps) {
   const { writeContractAsync: finishMilestone } = useScaffoldWriteContract("Akuntabel");
 
-  const openModal = (index: number) => {
-    selectedMilestoneRef.current = index;
-    modalRef.current?.showModal();
-  };
-
   const handleFinishMilestone = async (index: number) => {
-    if (selectedMilestoneRef.current !== null) {
-      try {
-        await finishMilestone({
-          args: [goalId, BigInt(index)],
-          functionName: "achieveMilestone",
-        });
-        modalRef.current?.close();
-      } catch (error) {
-        console.error(error);
-      }
+    try {
+      await finishMilestone({
+        args: [goalId, BigInt(index)],
+        functionName: "achieveMilestone",
+      });
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -82,24 +73,20 @@ export function GoalMilestones({ description, milestones, goalId }: GoalMileston
     <section className="h-full pl-4">
       <h4 className="text-md font-semibold underline">Milestones</h4>
       <ol className="list-decimal">
-        {milestones[0].map((milestoneDescription, index) => {
-          const isAchieved = milestones[1][index];
+        {milestones.map((milestone, index) => {
+          const { description, achieved } = milestone;
+          console.log({ milestone });
           return (
-            <li key={index} className="flex flex-col gap-2">
+            <li key={index + description} className="flex flex-col gap-2">
               <span>
-                {milestoneDescription} - {isAchieved ? "Achieved" : "Not Achieved"}
+                {description} - {achieved ? "Achieved" : "Not Achieved"}
               </span>
-              {!isAchieved && (
+              {!achieved && (
                 <>
-                  <button className="btn btn-sm w-fit btn-primary" onClick={() => openModal(index)}>
-                    Finish
-                  </button>
                   <MilestoneModal
-                    description={description}
-                    milestone={milestoneDescription}
-                    selectedMilestoneRef={selectedMilestoneRef}
-                    handleFinishMilestone={() => handleFinishMilestone(index)}
-                    modalRef={modalRef}
+                    goalDescription={goalDescription}
+                    milestoneDescription={description}
+                    handleFinishMilestone={async () => await handleFinishMilestone(index)}
                   />
                 </>
               )}

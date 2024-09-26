@@ -17,9 +17,7 @@ const GoalSummary = ({ goalId }: { goalId: Hex }) => {
 
   if (!goalDetails) return null;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_user, description, stake, _judges, requiredApprovals, currentApprovals, completed, fundsReleased] =
-    goalDetails;
+  const { description, stake, requiredApprovals, currentApprovals, completed, fundsReleased } = goalDetails;
 
   return (
     <div className="grid grid-rows-4 md:grid-rows-1 grid-cols-1 md:grid-cols-4 border border-base-content p-4 rounded-lg items-center">

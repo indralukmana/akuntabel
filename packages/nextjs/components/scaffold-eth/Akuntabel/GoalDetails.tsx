@@ -14,15 +14,19 @@ export function GoalDetails({ goalId }: { goalId: Hex }) {
     args: [goalId],
   });
 
-  const { data: goalMilestones } = useScaffoldReadContract({
-    contractName: "Akuntabel",
-    functionName: "getGoalMilestones",
-    args: [goalId],
-  });
-
   if (!goalDetails) return <p>Loading goal details...</p>;
 
-  const [user, description, stake, judges, requiredApprovals, currentApprovals, completed, fundsReleased] = goalDetails;
+  const {
+    user,
+    description,
+    stake,
+    judges,
+    requiredApprovals,
+    currentApprovals,
+    completed,
+    fundsReleased,
+    milestones,
+  } = goalDetails;
 
   return (
     <div className="bg-base-200 p-4 rounded-lg border border-base-content grid grid-cols-[max-content_max-content_1fr] divide-x-2 items-start gap-4 h-full">
@@ -36,13 +40,11 @@ export function GoalDetails({ goalId }: { goalId: Hex }) {
         requiredApprovals={requiredApprovals}
         currentApprovals={currentApprovals}
       />
-      {goalMilestones && (
-        <GoalMilestones
-          description={description}
-          milestones={goalMilestones as [string[], boolean[]]}
-          goalId={goalId}
-        />
-      )}
+      <GoalMilestones
+        goalDescription={description}
+        milestones={milestones as { description: string; achieved: boolean }[]}
+        goalId={goalId}
+      />
     </div>
   );
 }

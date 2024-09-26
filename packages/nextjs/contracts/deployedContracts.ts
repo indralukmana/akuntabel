@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Akuntabel: {
-      address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+      address: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
       abi: [
         {
           inputs: [],
@@ -342,44 +342,73 @@ const deployedContracts = {
           name: "getGoalDetails",
           outputs: [
             {
-              internalType: "address",
-              name: "user",
-              type: "address",
-            },
-            {
-              internalType: "string",
-              name: "description",
-              type: "string",
-            },
-            {
-              internalType: "uint256",
-              name: "stake",
-              type: "uint256",
-            },
-            {
-              internalType: "address[]",
-              name: "judges",
-              type: "address[]",
-            },
-            {
-              internalType: "uint256",
-              name: "requiredApprovals",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "currentApprovals",
-              type: "uint256",
-            },
-            {
-              internalType: "bool",
-              name: "completed",
-              type: "bool",
-            },
-            {
-              internalType: "bool",
-              name: "fundsReleased",
-              type: "bool",
+              components: [
+                {
+                  internalType: "address",
+                  name: "user",
+                  type: "address",
+                },
+                {
+                  internalType: "string",
+                  name: "description",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "stake",
+                  type: "uint256",
+                },
+                {
+                  internalType: "address[]",
+                  name: "judges",
+                  type: "address[]",
+                },
+                {
+                  internalType: "address[]",
+                  name: "approvals",
+                  type: "address[]",
+                },
+                {
+                  internalType: "uint256",
+                  name: "requiredApprovals",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "currentApprovals",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "completed",
+                  type: "bool",
+                },
+                {
+                  internalType: "bool",
+                  name: "fundsReleased",
+                  type: "bool",
+                },
+                {
+                  components: [
+                    {
+                      internalType: "string",
+                      name: "description",
+                      type: "string",
+                    },
+                    {
+                      internalType: "bool",
+                      name: "achieved",
+                      type: "bool",
+                    },
+                  ],
+                  internalType: "struct Akuntabel.Milestone[]",
+                  name: "milestones",
+                  type: "tuple[]",
+                },
+              ],
+              internalType: "struct Akuntabel.Goal",
+              name: "",
+              type: "tuple",
             },
           ],
           stateMutability: "view",
