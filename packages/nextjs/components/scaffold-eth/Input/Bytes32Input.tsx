@@ -15,7 +15,7 @@ export const Bytes32Input = ({ value, onChange, name, placeholder, disabled }: C
       name={name}
       value={value}
       placeholder={placeholder}
-      onChange={onChange}
+      onChange={newValue => onChange(newValue.toString())}
       disabled={disabled}
       suffix={
         <div

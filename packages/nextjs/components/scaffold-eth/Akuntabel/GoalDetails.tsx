@@ -1,15 +1,14 @@
 "use client";
 
 import { GoalOverview } from "./GoalOverview";
+import { Hex } from "viem";
 import { GoalMilestones } from "~~/components/scaffold-eth/Akuntabel/GoalMilestones";
 import { GoalStake } from "~~/components/scaffold-eth/Akuntabel/GoalStake";
 import { JudgesAndApprovals } from "~~/components/scaffold-eth/Akuntabel/JudgesAndApprovals";
 import { useGoalDetails } from "~~/hooks/akuntabel/useGoalDetails";
 
-export function GoalDetails({ goalId }: { goalId: bigint }) {
-  const { goalDetails, isLoading } = useGoalDetails(goalId);
-
-  if (isLoading) return <p>Loading goal details...</p>;
+export function GoalDetails({ goalHash }: { goalHash: Hex }) {
+  const { goalDetails } = useGoalDetails(goalHash);
 
   const {
     user,
@@ -22,7 +21,7 @@ export function GoalDetails({ goalId }: { goalId: bigint }) {
     fundsReleased,
     milestoneDescriptions,
     milestoneAchieved,
-  } = goalDetails;
+  } = goalDetails ?? {};
 
   return (
     <div className="bg-base-200 p-4 rounded-lg border border-base-content grid grid-cols-[max-content_max-content_1fr] divide-x-2 items-start gap-4">
@@ -44,7 +43,7 @@ export function GoalDetails({ goalId }: { goalId: bigint }) {
         goalDescription={description ?? ""}
         milestonesDescriptions={milestoneDescriptions}
         milestonesAchieved={milestoneAchieved}
-        goalId={goalId}
+        goalHash={goalHash}
       />
     </div>
   );

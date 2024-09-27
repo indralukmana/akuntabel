@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef } from "react";
+import { Hex } from "viem";
+import { useGoalDetails } from "~~/hooks/akuntabel/useGoalDetails";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 
@@ -8,9 +10,10 @@ type MilestoneModalProps = {
   goalDescription: string;
   milestoneDescription: string;
   onConfirm: () => Promise<void>;
+  isLoading: boolean;
 };
 
-const MilestoneModal = ({ goalDescription, milestoneDescription, onConfirm }: MilestoneModalProps) => {
+const MilestoneModal = ({ goalDescription, milestoneDescription, onConfirm, isLoading }: MilestoneModalProps) => {
   const modalRef = useRef<HTMLDialogElement>(null);
   const openModal = () => {
     modalRef.current?.showModal();
@@ -37,13 +40,13 @@ const MilestoneModal = ({ goalDescription, milestoneDescription, onConfirm }: Mi
             <form method="dialog">
               <button className="btn btn-outline mr-2">Cancel</button>
             </form>
-            <button className="btn btn-primary" onClick={() => handleConfirm()}>
-              Confirm
+            <button className="btn btn-primary" onClick={() => handleConfirm()} disabled={isLoading}>
+              {isLoading ? "Finishing..." : "Confirm"}
             </button>
           </div>
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button>close</button>
+          <button disabled={isLoading}>close</button>
         </form>
       </dialog>
       <button className="btn btn-sm w-fit btn-primary" onClick={() => openModal()}>
@@ -57,23 +60,25 @@ interface GoalMilestonesProps {
   goalDescription: string;
   milestonesDescriptions: readonly string[] | undefined;
   milestonesAchieved: readonly boolean[] | undefined;
-  goalId: bigint;
+  goalHash: Hex;
 }
 
 export function GoalMilestones({
   goalDescription,
   milestonesDescriptions,
   milestonesAchieved,
-  goalId,
+  goalHash,
 }: GoalMilestonesProps) {
-  const { writeContractAsync: finishMilestone } = useScaffoldWriteContract("Akuntabel");
+  const { writeContractAsync: finishMilestone, isMining } = useScaffoldWriteContract("Akuntabel");
+  const { refetchGoalDetails, isLoadingData } = useGoalDetails(goalHash);
 
   const handleFinishMilestone = async (index: number) => {
     try {
       await finishMilestone({
-        args: [goalId, BigInt(index)],
+        args: [goalHash, BigInt(index)],
         functionName: "achieveMilestone",
       });
+      await refetchGoalDetails();
       notification.success("Milestone finished successfully!");
     } catch (error) {
       notification.error("Error finishing milestone. Check console for details.");
@@ -98,6 +103,7 @@ export function GoalMilestones({
                     goalDescription={goalDescription}
                     milestoneDescription={description}
                     onConfirm={async () => await handleFinishMilestone(index)}
+                    isLoading={isMining || isLoadingData}
                   />
                 </>
               )}

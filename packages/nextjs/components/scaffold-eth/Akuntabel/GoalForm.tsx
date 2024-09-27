@@ -1,8 +1,9 @@
 import React from "react";
 import { Controller, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { parseEther } from "viem";
+import { Address, parseEther } from "viem";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { AddressInput, EtherInput, InputBase } from "~~/components/scaffold-eth";
+import { useGoalNonce } from "~~/hooks/akuntabel/useGoalNonce";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 
@@ -14,8 +15,11 @@ interface FormValues {
   stake: string;
 }
 
-export const GoalForm = () => {
-  const { writeContractAsync } = useScaffoldWriteContract("Akuntabel");
+export const GoalForm = ({ address }: { address: Address }) => {
+  const { writeContractAsync, isMining } = useScaffoldWriteContract("Akuntabel");
+  const { isLoadingGoalNonce, refetchGoalNonce } = useGoalNonce(address);
+
+  const isCreatingGoal = isMining || isLoadingGoalNonce;
 
   const {
     control,
@@ -66,6 +70,7 @@ export const GoalForm = () => {
         ],
         value: parseEther(data.stake),
       });
+      await refetchGoalNonce();
       notification.success("Goal created successfully!");
       reset();
     } catch (error) {
@@ -121,9 +126,11 @@ export const GoalForm = () => {
                   />
                 )}
               />
-              <button type="button" onClick={() => removeJudge(index)} className="btn btn-error btn-sm mb-1">
-                Remove
-              </button>
+              {judgeFields.length > 1 && (
+                <button type="button" onClick={() => removeJudge(index)} className="btn btn-error btn-sm mb-1">
+                  Remove
+                </button>
+              )}
             </div>
           ))}
           <button type="button" onClick={() => appendJudge({ address: "" })} className="btn btn-secondary btn-sm">
@@ -140,12 +147,14 @@ export const GoalForm = () => {
               min: { value: 1, message: "Minimum required approvals is 1" },
               max: { value: judgeFields.length, message: `Maximum required approvals is ${judgeFields.length}` },
             }}
-            render={({ field }) => (
+            render={({ field: { value, onChange, ...fieldProps } }) => (
               <InputBase
-                {...field}
+                {...fieldProps}
                 label="Required Approvals"
                 error={!!errors.requiredApprovals}
                 errorMessage={errors.requiredApprovals?.message}
+                onChange={newValue => onChange(Number(newValue))}
+                value={value.toString()}
               />
             )}
           />
@@ -183,9 +192,11 @@ export const GoalForm = () => {
                   />
                 )}
               />
-              <button type="button" onClick={() => removeMilestone(index)} className="btn btn-error btn-sm mb-1">
-                Remove
-              </button>
+              {milestoneFields.length > 1 && (
+                <button type="button" onClick={() => removeMilestone(index)} className="btn btn-error btn-sm mb-1">
+                  Remove
+                </button>
+              )}
             </div>
           ))}
           <button
@@ -197,8 +208,8 @@ export const GoalForm = () => {
           </button>
         </div>
       </div>
-      <button type="submit" className="btn btn-primary">
-        Create Goal
+      <button type="submit" className="btn btn-primary" disabled={isCreatingGoal}>
+        {isCreatingGoal ? "Creating Goal..." : "Create Goal"}
       </button>
     </form>
   );

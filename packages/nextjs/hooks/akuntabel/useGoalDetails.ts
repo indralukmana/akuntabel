@@ -1,53 +1,19 @@
-import { useScaffoldReadContract, useScaffoldWatchContractEvent } from "~~/hooks/scaffold-eth";
+import { Hex } from "viem";
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
-export const useGoalDetails = (goalId: bigint) => {
+export const useGoalDetails = (goalHash: Hex) => {
   const {
-    data: goalDetailsData,
+    data: goalDetails,
     isLoading,
-    refetch,
+    isRefetching,
+    refetch: refetchGoalDetails,
   } = useScaffoldReadContract({
     contractName: "Akuntabel",
     functionName: "getGoalDetails",
-    args: [goalId],
+    args: [goalHash],
   });
 
-  useScaffoldWatchContractEvent({
-    contractName: "Akuntabel",
-    eventName: "MilestoneAchieved",
-    onLogs: logs => {
-      logs.forEach(log => {
-        if (log.args.goalId === goalId) {
-          refetch();
-        }
-      });
-    },
-  });
+  const isLoadingData = isLoading || isRefetching;
 
-  useScaffoldWatchContractEvent({
-    contractName: "Akuntabel",
-    eventName: "GoalApproved",
-    onLogs: logs => {
-      logs.forEach(log => {
-        if (log.args.goalId === goalId) {
-          refetch();
-        }
-      });
-    },
-  });
-
-  const goalDetails = {
-    user: goalDetailsData?.[0],
-    description: goalDetailsData?.[1],
-    stake: goalDetailsData?.[2],
-    judges: goalDetailsData?.[3],
-    requiredApprovals: goalDetailsData?.[4],
-    currentApprovals: goalDetailsData?.[5],
-    verifiedApprovals: goalDetailsData?.[6],
-    milestoneDescriptions: goalDetailsData?.[7],
-    milestoneAchieved: goalDetailsData?.[8],
-    completed: goalDetailsData?.[9],
-    fundsReleased: goalDetailsData?.[10],
-  };
-
-  return { goalDetails, isLoading };
+  return { goalDetails, isLoadingData, refetchGoalDetails };
 };

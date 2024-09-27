@@ -28,17 +28,17 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         bool fundsReleased;
     }
 
-    mapping(uint256 => Goal) public goals;
-    mapping(address => uint256) public goalNonce;
+    mapping(address => uint256) public userGoalNonce;
+    mapping(bytes32 => Goal) public userGoalsByHash;
 
-    event GoalCreated(uint256 indexed goalId, address indexed user, string description, uint256 stake);
-    event MilestoneAdded(uint256 indexed goalId, uint256 milestoneIndex, string description);
-    event MilestoneAchieved(uint256 indexed goalId, uint256 milestoneIndex);
-    event JudgeInvited(uint256 indexed goalId, address indexed judge);
-    event GoalApproved(uint256 indexed goalId, address indexed judge);
-    event GoalCompleted(uint256 indexed goalId);
-    event FundsReleased(uint256 indexed goalId, address indexed user, uint256 amount);
-    event RequiredApprovalsSet(uint256 indexed goalId, uint256 requiredApprovals);
+    event GoalCreated(bytes32 indexed goalHash, address indexed user, string description, uint256 stake);
+    event MilestoneAdded(bytes32 indexed goalHash, uint256 milestoneIndex, string description);
+    event MilestoneAchieved(bytes32 indexed goalHash, uint256 milestoneIndex);
+    event JudgeInvited(bytes32 indexed goalHash, address indexed judge);
+    event GoalApproved(bytes32 indexed goalHash, address indexed judge);
+    event GoalCompleted(bytes32 indexed goalHash);
+    event FundsReleased(bytes32 indexed goalHash, address indexed user, uint256 amount);
+    event RequiredApprovalsSet(bytes32 indexed goalHash, uint256 requiredApprovals);
 
     constructor() {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -60,11 +60,13 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         require(msg.value > 0, "Stake must be greater than 0");
         require(_judges.length > 0, "At least one judge is required");
         require(_judges.length < 256, "Too many judges");
+        require(noJudgeDuplicates(_judges), "Found duplicate judge");
         require(_milestoneDescriptions.length > 0, "At least one milestone is required");
         require(_requiredApprovals > 0 && _requiredApprovals <= _judges.length, "Invalid number of required approvals");
 
-        uint256 goalId = goalNonce[msg.sender]++;
-        Goal storage newGoal = goals[goalId];
+        uint256 senderGoalNonce = userGoalNonce[msg.sender]++;
+        bytes32 goalHash = keccak256(abi.encodePacked(msg.sender, senderGoalNonce));
+        Goal storage newGoal = userGoalsByHash[goalHash];
         newGoal.user = msg.sender;
         newGoal.description = _description;
         newGoal.stake = msg.value;
@@ -73,37 +75,49 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
 
         for (uint256 i = 0; i < _judges.length; i++) {
             newGoal.verifiedApprovals.push(false);
-            emit JudgeInvited(goalId, _judges[i]);
+            emit JudgeInvited(goalHash, _judges[i]);
         }
 
         for (uint256 i = 0; i < _milestoneDescriptions.length; i++) {
             newGoal.milestoneDescriptions.push(_milestoneDescriptions[i]);
             newGoal.milestoneAchieved.push(false);
-            emit MilestoneAdded(goalId, i, _milestoneDescriptions[i]);
+            emit MilestoneAdded(goalHash, i, _milestoneDescriptions[i]);
         }
 
-        emit GoalCreated(goalId, msg.sender, _description, msg.value);
-        emit RequiredApprovalsSet(goalId, _requiredApprovals);
+        emit GoalCreated(goalHash, msg.sender, _description, msg.value);
+        emit RequiredApprovalsSet(goalHash, _requiredApprovals);
     }
 
-    function achieveMilestone(uint256 _goalId, uint256 _milestoneIndex) external {
-        Goal storage goal = goals[_goalId];
+    function noJudgeDuplicates(address[] memory _judges) internal pure returns (bool) {
+        for (uint256 i = 0; i < _judges.length; i++) {
+            for (uint256 j = i + 1; j < _judges.length; j++) {
+                if (_judges[i] == _judges[j]) {
+                    return false;
+                }   
+            }
+        }
+        return true;
+    }
+
+
+    function achieveMilestone(bytes32 _goalHash, uint256 _milestoneIndex) external {
+        Goal storage goal = userGoalsByHash[_goalHash];
         require(msg.sender == goal.user, "Only goal creator can achieve milestones");
         require(_milestoneIndex < goal.milestoneAchieved.length, "Invalid milestone index");
         require(!goal.milestoneAchieved[_milestoneIndex], "Milestone already achieved");
 
         goal.milestoneAchieved[_milestoneIndex] = true;
-        emit MilestoneAchieved(_goalId, _milestoneIndex);
+        emit MilestoneAchieved(_goalHash, _milestoneIndex);
 
-        if (areAllMilestonesAchieved(_goalId)) {
+        if (areAllMilestonesAchieved(_goalHash)) {
             goal.completed = true;
-            emit GoalCompleted(_goalId);
+            emit GoalCompleted(_goalHash);
         }
     }
 
-    function approveGoal(uint256 _goalId) external nonReentrant {
-        Goal storage goal = goals[_goalId];
-        uint256 judgeIndex = findJudgeIndex(_goalId, msg.sender);
+    function approveGoal(bytes32 _goalHash) external nonReentrant {
+        Goal storage goal = userGoalsByHash[_goalHash];
+        uint256 judgeIndex = findJudgeIndex(_goalHash, msg.sender);
 
         require(judgeIndex < 256, "Judge not found");
 
@@ -113,15 +127,15 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
 
         goal.verifiedApprovals[judgeIndex] = true;
         goal.currentApprovals++;
-        emit GoalApproved(_goalId, msg.sender);
+        emit GoalApproved(_goalHash, msg.sender);
 
         if (goal.currentApprovals == goal.requiredApprovals) {
-            releaseFunds(_goalId);
+            releaseFunds(_goalHash);
         }
     }
 
-    function findJudgeIndex(uint256 _goalId, address _judge) internal view returns (uint256) {
-        Goal storage goal = goals[_goalId];
+    function findJudgeIndex(bytes32 _goalHash, address _judge) internal view returns (uint256) {
+        Goal storage goal = userGoalsByHash[_goalHash];
         for (uint256 i = 0; i < goal.judges.length; i++) {
             if (goal.judges[i] == _judge) {
                 return i;
@@ -133,8 +147,8 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
 
   
 
-    function areAllMilestonesAchieved(uint256 _goalId) internal view returns (bool) {
-        Goal storage goal = goals[_goalId];
+    function areAllMilestonesAchieved(bytes32 _goalHash) internal view returns (bool) {
+        Goal storage goal = userGoalsByHash[_goalHash];
         for (uint256 i = 0; i < goal.milestoneAchieved.length; i++) {
             if (!goal.milestoneAchieved[i]) {
                 return false;
@@ -143,13 +157,13 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         return true;
     }
 
-    function releaseFunds(uint256 _goalId) internal {
-        Goal storage goal = goals[_goalId];
+    function releaseFunds(bytes32 _goalHash) internal {
+        Goal storage goal = userGoalsByHash[_goalHash];
         require(goal.completed, "Goal not completed");
         require(!goal.fundsReleased, "Funds already released");
 
         goal.fundsReleased = true;
-        emit FundsReleased(_goalId, goal.user, goal.stake);
+        emit FundsReleased(_goalHash, goal.user, goal.stake);
         payable(goal.user).transfer(goal.stake);
     }
 
@@ -158,32 +172,9 @@ contract Akuntabel is ReentrancyGuard, AccessControl {
         payable(msg.sender).transfer(_amount);
     }
 
-    function getGoalDetails(uint256 _goalId) external view returns (
-        address user,
-        string memory description,
-        uint256 stake,
-        address[] memory judges,
-        uint8 requiredApprovals,
-        uint8 currentApprovals,
-        bool[] memory verifiedApprovals,
-        string[] memory milestoneDescriptions,
-        bool[] memory milestoneAchieved,
-        bool completed,
-        bool fundsReleased
+    function getGoalDetails(bytes32 _goalHash) external view returns (
+    Goal memory goal
     ) {
-        Goal storage goal = goals[_goalId];
-        return (
-            goal.user,
-            goal.description,
-            goal.stake,
-            goal.judges,
-            goal.requiredApprovals,
-            goal.currentApprovals,
-            goal.verifiedApprovals,
-            goal.milestoneDescriptions,
-            goal.milestoneAchieved,
-            goal.completed,
-            goal.fundsReleased
-        );
+        return userGoalsByHash[_goalHash];
     }
 }

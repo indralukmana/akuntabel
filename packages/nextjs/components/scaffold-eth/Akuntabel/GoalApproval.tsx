@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { Hex } from "viem";
 import { useAccount } from "wagmi";
 import { useGoalDetails } from "~~/hooks/akuntabel/useGoalDetails";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
@@ -9,9 +10,10 @@ type ApprovalModalProps = {
   description: string;
   handleApproveGoal: () => void;
   modalRef: React.RefObject<HTMLDialogElement>;
+  isLoading: boolean;
 };
 
-const ApprovalModal = ({ description, handleApproveGoal, modalRef }: ApprovalModalProps) => {
+const ApprovalModal = ({ description, handleApproveGoal, modalRef, isLoading }: ApprovalModalProps) => {
   return (
     <dialog id="approve_goal_modal" className="modal" ref={modalRef}>
       <div className="modal-box">
@@ -24,37 +26,33 @@ const ApprovalModal = ({ description, handleApproveGoal, modalRef }: ApprovalMod
           <form method="dialog">
             <button className="btn btn-outline mr-2">Cancel</button>
           </form>
-          <button className="btn btn-primary" onClick={handleApproveGoal}>
-            Confirm
+          <button className="btn btn-primary" onClick={handleApproveGoal} disabled={isLoading}>
+            {isLoading ? "Approving..." : "Confirm"}
           </button>
         </div>
       </div>
       <form method="dialog" className="modal-backdrop">
-        <button>close</button>
+        <button disabled={isLoading}>close</button>
       </form>
     </dialog>
   );
 };
 
 type GoalApprovalProps = {
-  goalId: bigint;
+  goalHash: Hex;
 };
 
-const GoalApproval = ({ goalId }: GoalApprovalProps) => {
+const GoalApproval = ({ goalHash }: GoalApprovalProps) => {
   const modalRef = useRef<HTMLDialogElement>(null);
   const { address } = useAccount();
-  const { writeContractAsync: approveGoal } = useScaffoldWriteContract("Akuntabel");
+  const { writeContractAsync: approveGoal, isMining } = useScaffoldWriteContract("Akuntabel");
 
-  const { goalDetails, isLoading } = useGoalDetails(goalId);
+  const { goalDetails, isLoadingData, refetchGoalDetails } = useGoalDetails(goalHash);
 
-  if (isLoading) return <p>Loading goal details...</p>;
-
-  const { description, judges, verifiedApprovals, completed } = goalDetails;
-
-  if (!address) return <p>Loading address...</p>;
+  const { description, judges, verifiedApprovals, completed } = goalDetails ?? {};
 
   const judgeIndex = judges?.findIndex(judge => judge === address);
-  const isJudge = judgeIndex !== -1;
+  const isJudge = judgeIndex !== undefined && judgeIndex !== -1;
   const alreadyApproved = judgeIndex !== undefined && verifiedApprovals?.[judgeIndex];
 
   if (!isJudge) return null;
@@ -66,9 +64,10 @@ const GoalApproval = ({ goalId }: GoalApprovalProps) => {
   const handleApproveGoal = async () => {
     try {
       await approveGoal({
-        args: [goalId],
+        args: [goalHash],
         functionName: "approveGoal",
       });
+      await refetchGoalDetails();
     } catch (error) {
       console.error(error);
     } finally {
@@ -90,10 +89,15 @@ const GoalApproval = ({ goalId }: GoalApprovalProps) => {
           The goal milestones has not been achieved yet so approval is not activated
         </p>
       )}
-      <button className="btn btn-primary" onClick={openModal} disabled={!completed}>
+      <button className="btn btn-primary" onClick={openModal} disabled={!completed || isMining}>
         Approve Goal
       </button>
-      <ApprovalModal description={description ?? ""} handleApproveGoal={handleApproveGoal} modalRef={modalRef} />
+      <ApprovalModal
+        description={description ?? ""}
+        handleApproveGoal={handleApproveGoal}
+        modalRef={modalRef}
+        isLoading={isMining || isLoadingData}
+      />
     </section>
   );
 };

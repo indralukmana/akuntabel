@@ -12,9 +12,13 @@ const Home: NextPage = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <GoalForm />
-
-      {!isLoadingAddress && address && <GoalsList address={address} />}
+      {!address && <p>Connect your wallet to start</p>}
+      {!isLoadingAddress && address && (
+        <>
+          <GoalForm address={address} />
+          <GoalsList address={address} />
+        </>
+      )}
     </div>
   );
 };

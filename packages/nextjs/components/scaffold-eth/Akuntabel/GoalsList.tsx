@@ -2,14 +2,17 @@
 
 import React from "react";
 import Link from "next/link";
-import { Address as AddressType, formatEther } from "viem";
+import { Address as AddressType, Hex, formatEther } from "viem";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { Address } from "~~/components/scaffold-eth";
 import { useGoalDetails } from "~~/hooks/akuntabel/useGoalDetails";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useGoalNonce } from "~~/hooks/akuntabel/useGoalNonce";
+import { getGoalHash } from "~~/utils/akutabel/getGoalHash";
 
-const GoalSummary = ({ goalId }: { goalId: bigint }) => {
-  const { goalDetails } = useGoalDetails(goalId);
+const GoalSummary = ({ goalHash }: { goalHash: Hex }) => {
+  const { goalDetails } = useGoalDetails(goalHash);
+
+  console.log("goalDetails", goalDetails);
 
   if (!goalDetails) return null;
 
@@ -41,11 +44,8 @@ const GoalSummary = ({ goalId }: { goalId: bigint }) => {
 };
 
 export const GoalsList = ({ address }: { address: AddressType }) => {
-  const { data: goalNonce } = useScaffoldReadContract({
-    contractName: "Akuntabel",
-    functionName: "goalNonce",
-    args: [address],
-  });
+  const { goalNonce } = useGoalNonce(address);
+
   return (
     <>
       <div className="mt-8">
@@ -61,13 +61,12 @@ export const GoalsList = ({ address }: { address: AddressType }) => {
         <h2 className="text-xl font-semibold mb-2">All Goals</h2>
         <ul className="space-y-4">
           {Array.from({ length: Number(goalNonce) }).map((_, index) => {
-            const goalId = BigInt(index);
-
+            const goalHash = getGoalHash(address, index);
             return (
               <li key={index}>
                 {address && (
-                  <Link href={`/goals/${goalId}`}>
-                    <GoalSummary goalId={goalId} />
+                  <Link href={`/goals/${goalHash}`}>
+                    <GoalSummary goalHash={goalHash} />
                   </Link>
                 )}
               </li>
