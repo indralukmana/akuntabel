@@ -618,7 +618,7 @@ const deployedContracts = {
   },
   11155111: {
     Akuntabel: {
-      address: "0x8925869e0d0fF478c516cC662F2217cfAC2d8e5d",
+      address: "0x64D4B23b0cBAe104D5461558D9EB8e60d07d2735",
       abi: [
         {
           inputs: [],
@@ -630,9 +630,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
-              name: "goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "goalHash",
+              type: "bytes32",
             },
             {
               indexed: true,
@@ -655,9 +655,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
-              name: "goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "goalHash",
+              type: "bytes32",
             },
             {
               indexed: true,
@@ -674,9 +674,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
-              name: "goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "goalHash",
+              type: "bytes32",
             },
           ],
           name: "GoalCompleted",
@@ -687,9 +687,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
-              name: "goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "goalHash",
+              type: "bytes32",
             },
             {
               indexed: true,
@@ -718,9 +718,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
-              name: "goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "goalHash",
+              type: "bytes32",
             },
             {
               indexed: true,
@@ -737,9 +737,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
-              name: "goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "goalHash",
+              type: "bytes32",
             },
             {
               indexed: false,
@@ -756,9 +756,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
-              name: "goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "goalHash",
+              type: "bytes32",
             },
             {
               indexed: false,
@@ -781,9 +781,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "uint256",
-              name: "goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "goalHash",
+              type: "bytes32",
             },
             {
               indexed: false,
@@ -886,9 +886,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
-              name: "_goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "_goalHash",
+              type: "bytes32",
             },
             {
               internalType: "uint256",
@@ -904,9 +904,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
-              name: "_goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "_goalHash",
+              type: "bytes32",
             },
           ],
           name: "approveGoal",
@@ -945,67 +945,74 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
-              name: "_goalId",
-              type: "uint256",
+              internalType: "bytes32",
+              name: "_goalHash",
+              type: "bytes32",
             },
           ],
           name: "getGoalDetails",
           outputs: [
             {
-              internalType: "address",
-              name: "user",
-              type: "address",
-            },
-            {
-              internalType: "string",
-              name: "description",
-              type: "string",
-            },
-            {
-              internalType: "uint256",
-              name: "stake",
-              type: "uint256",
-            },
-            {
-              internalType: "address[]",
-              name: "judges",
-              type: "address[]",
-            },
-            {
-              internalType: "uint8",
-              name: "requiredApprovals",
-              type: "uint8",
-            },
-            {
-              internalType: "uint8",
-              name: "currentApprovals",
-              type: "uint8",
-            },
-            {
-              internalType: "bool[]",
-              name: "verifiedApprovals",
-              type: "bool[]",
-            },
-            {
-              internalType: "string[]",
-              name: "milestoneDescriptions",
-              type: "string[]",
-            },
-            {
-              internalType: "bool[]",
-              name: "milestoneAchieved",
-              type: "bool[]",
-            },
-            {
-              internalType: "bool",
-              name: "completed",
-              type: "bool",
-            },
-            {
-              internalType: "bool",
-              name: "fundsReleased",
-              type: "bool",
+              components: [
+                {
+                  internalType: "address",
+                  name: "user",
+                  type: "address",
+                },
+                {
+                  internalType: "string",
+                  name: "description",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "stake",
+                  type: "uint256",
+                },
+                {
+                  internalType: "address[]",
+                  name: "judges",
+                  type: "address[]",
+                },
+                {
+                  internalType: "uint8",
+                  name: "requiredApprovals",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "currentApprovals",
+                  type: "uint8",
+                },
+                {
+                  internalType: "bool[]",
+                  name: "verifiedApprovals",
+                  type: "bool[]",
+                },
+                {
+                  internalType: "string[]",
+                  name: "milestoneDescriptions",
+                  type: "string[]",
+                },
+                {
+                  internalType: "bool[]",
+                  name: "milestoneAchieved",
+                  type: "bool[]",
+                },
+                {
+                  internalType: "bool",
+                  name: "completed",
+                  type: "bool",
+                },
+                {
+                  internalType: "bool",
+                  name: "fundsReleased",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct Akuntabel.Goal",
+              name: "goal",
+              type: "tuple",
             },
           ],
           stateMutability: "view",
@@ -1025,74 +1032,6 @@ const deployedContracts = {
               internalType: "bytes32",
               name: "",
               type: "bytes32",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          name: "goalNonce",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "goals",
-          outputs: [
-            {
-              internalType: "address",
-              name: "user",
-              type: "address",
-            },
-            {
-              internalType: "string",
-              name: "description",
-              type: "string",
-            },
-            {
-              internalType: "uint256",
-              name: "stake",
-              type: "uint256",
-            },
-            {
-              internalType: "uint8",
-              name: "requiredApprovals",
-              type: "uint8",
-            },
-            {
-              internalType: "uint8",
-              name: "currentApprovals",
-              type: "uint8",
-            },
-            {
-              internalType: "bool",
-              name: "completed",
-              type: "bool",
-            },
-            {
-              internalType: "bool",
-              name: "fundsReleased",
-              type: "bool",
             },
           ],
           stateMutability: "view",
@@ -1189,6 +1128,74 @@ const deployedContracts = {
             {
               internalType: "bool",
               name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "userGoalNonce",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          name: "userGoalsByHash",
+          outputs: [
+            {
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "description",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "stake",
+              type: "uint256",
+            },
+            {
+              internalType: "uint8",
+              name: "requiredApprovals",
+              type: "uint8",
+            },
+            {
+              internalType: "uint8",
+              name: "currentApprovals",
+              type: "uint8",
+            },
+            {
+              internalType: "bool",
+              name: "completed",
+              type: "bool",
+            },
+            {
+              internalType: "bool",
+              name: "fundsReleased",
               type: "bool",
             },
           ],

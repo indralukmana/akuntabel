@@ -12,33 +12,44 @@ import { getGoalHash } from "~~/utils/akutabel/getGoalHash";
 const GoalSummary = ({ goalHash }: { goalHash: Hex }) => {
   const { goalDetails } = useGoalDetails(goalHash);
 
-  console.log("goalDetails", goalDetails);
-
   if (!goalDetails) return null;
 
   const { description, stake, requiredApprovals, currentApprovals, completed, fundsReleased } = goalDetails;
 
   return (
-    <div className="grid grid-rows-4 md:grid-rows-1 grid-cols-1 md:grid-cols-4 border border-base-content p-4 rounded-lg items-center">
-      <div>
-        <p>Description: {description}</p>
-        <p>Stake: {stake ? formatEther(stake) : ""} ETH</p>
+    <div className="grid grid-rows-4 md:grid-rows-1 grid-cols-1 md:grid-cols-4 border border-base-content p-4 rounded-lg items-center divide-x-2 gap-2">
+      <div className="h-full p-2">
+        <p className="flex flex-col">
+          <strong>Description:</strong> {description}
+        </p>
+        <p>
+          <strong>Stake:</strong> {stake ? formatEther(stake) : ""} ETH
+        </p>
       </div>
-      <div>
-        <p>Required Approvals: {Number(requiredApprovals)}</p>
-        <p>Current Approvals: {Number(currentApprovals)}</p>
+      <div className="h-full p-2">
+        <p>
+          <strong>Required Approvals:</strong> {Number(requiredApprovals)}
+        </p>
+        <p>
+          <strong>Current Approvals:</strong> {Number(currentApprovals)}
+        </p>
       </div>
-      <div className="flex items-center gap-2">
-        Completed:
-        {completed ? (
-          <CheckCircleIcon className="w-4 h-4 text-green-500" />
-        ) : (
-          <XCircleIcon className="w-4 h-4 text-red-500" />
-        )}
+      <div className="h-full flex items-center justify-center gap-2 p-2">
+        <p className="flex items-center gap-2">
+          <strong>Completed:</strong>
+          {completed ? (
+            <CheckCircleIcon className="w-4 h-4 text-green-500" />
+          ) : (
+            <XCircleIcon className="w-4 h-4 text-red-500" />
+          )}
+        </p>
       </div>
-      <p>
-        Funds Released: <strong>{fundsReleased ? "Released" : "Not Released"}</strong>
-      </p>
+      <div className="h-full flex items-center justify-center gap-2 p-2">
+        <p className="flex items-center gap-2">
+          <strong>Funds Released:</strong>
+          <i>{fundsReleased ? "Released" : "Not Released"}</i>
+        </p>
+      </div>
     </div>
   );
 };
