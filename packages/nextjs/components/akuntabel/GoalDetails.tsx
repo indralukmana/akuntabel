@@ -2,9 +2,9 @@
 
 import { GoalOverview } from "./GoalOverview";
 import { Hex } from "viem";
-import { GoalMilestones } from "~~/components/scaffold-eth/Akuntabel/GoalMilestones";
-import { GoalStake } from "~~/components/scaffold-eth/Akuntabel/GoalStake";
-import { JudgesAndApprovals } from "~~/components/scaffold-eth/Akuntabel/JudgesAndApprovals";
+import { GoalMilestones } from "~~/components/akuntabel/GoalMilestones";
+import { GoalStake } from "~~/components/akuntabel/GoalStake";
+import { JudgesAndApprovals } from "~~/components/akuntabel/JudgesAndApprovals";
 import { useGoalDetails } from "~~/hooks/akuntabel/useGoalDetails";
 
 export function GoalDetails({ goalHash }: { goalHash: Hex }) {

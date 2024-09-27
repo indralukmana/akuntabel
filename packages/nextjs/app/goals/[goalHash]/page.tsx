@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { NextPage } from "next";
 import { Hex, isHex } from "viem";
-import GoalApproval from "~~/components/scaffold-eth/Akuntabel/GoalApproval";
-import { GoalDetails } from "~~/components/scaffold-eth/Akuntabel/GoalDetails";
+import GoalApproval from "~~/components/akuntabel/GoalApproval";
+import { GoalDetails } from "~~/components/akuntabel/GoalDetails";
 
 type GoalPageProps = {
   params: { goalHash: Hex };

@@ -11,10 +11,18 @@ import { useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
 
+type RainbowKitCustomConnectButtonProps = {
+  buttonContent?: React.ReactNode;
+  buttonClassName?: string;
+};
+
 /**
  * Custom Wagmi Connect Button (watch balance + custom design)
  */
-export const RainbowKitCustomConnectButton = () => {
+export const RainbowKitCustomConnectButton = ({
+  buttonContent,
+  buttonClassName,
+}: RainbowKitCustomConnectButtonProps) => {
   const networkColor = useNetworkColor();
   const { targetNetwork } = useTargetNetwork();
 
@@ -31,8 +39,12 @@ export const RainbowKitCustomConnectButton = () => {
             {(() => {
               if (!connected) {
                 return (
-                  <button className="btn btn-primary btn-sm" onClick={openConnectModal} type="button">
-                    Connect Wallet
+                  <button
+                    className={buttonClassName ?? "btn btn-primary btn-sm"}
+                    onClick={openConnectModal}
+                    type="button"
+                  >
+                    {buttonContent ?? "Connect Wallet"}
                   </button>
                 );
               }
