@@ -16,6 +16,8 @@ export const AddressInput = ({
   onChange,
   disabled,
   label,
+  error,
+  errorMessage,
 }: CommonInputProps<Address | string>) => {
   // Debounce the input to keep clean RPC calls when resolving ENS names
   // If the input is an address, we don't need to debounce it
@@ -94,11 +96,12 @@ export const AddressInput = ({
       name={name}
       label={label}
       placeholder={placeholder}
-      error={ensAddress === null}
+      error={ensAddress === null || error}
       value={value as Address}
       onChange={handleChange}
       disabled={isEnsAddressLoading || isEnsNameLoading || disabled}
       reFocus={reFocus}
+      errorMessage={errorMessage}
       prefix={
         ensName ? (
           <div className="flex bg-base-300 rounded-l-full items-center">

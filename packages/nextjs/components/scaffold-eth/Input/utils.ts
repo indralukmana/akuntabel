@@ -5,6 +5,8 @@ export type CommonInputProps<T = string> = {
   label?: string;
   placeholder?: string;
   disabled?: boolean;
+  error?: boolean;
+  errorMessage?: string;
 };
 
 export enum IntegerVariant {

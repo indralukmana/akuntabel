@@ -52,6 +52,8 @@ export const EtherInput = ({
   disabled,
   usdMode,
   label,
+  error,
+  errorMessage,
 }: CommonInputProps & { usdMode?: boolean }) => {
   const [transitoryDisplayValue, setTransitoryDisplayValue] = useState<string>();
   const nativeCurrencyPrice = useGlobalState(state => state.nativeCurrency.price);
@@ -105,6 +107,8 @@ export const EtherInput = ({
       placeholder={placeholder}
       onChange={handleChangeNumber}
       disabled={disabled}
+      error={error}
+      errorMessage={errorMessage}
       prefix={<span className="pl-4 -mr-2 text-accent self-center">{displayUsdMode ? "$" : "Ξ"}</span>}
       suffix={
         <div

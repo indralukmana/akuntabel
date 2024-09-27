@@ -1,125 +1,165 @@
-import React, { useState } from "react";
+import React from "react";
+import { Controller, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { parseEther } from "viem";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { AddressInput, EtherInput, InputBase } from "~~/components/scaffold-eth";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
+
+interface FormValues {
+  description: string;
+  judges: { address: string }[];
+  milestones: { description: string }[];
+  requiredApprovals: number;
+  stake: string;
+}
 
 export const GoalForm = () => {
-  const [description, setDescription] = useState<string>("");
-  const [judges, setJudges] = useState<string[]>([]);
-  const [milestones, setMilestones] = useState<string[]>([]);
-  const [requiredApprovals, setRequiredApprovals] = useState<number>(1);
-  const [stake, setStake] = useState<string>("");
-
   const { writeContractAsync } = useScaffoldWriteContract("Akuntabel");
 
-  const handleCreateGoal = async () => {
-    if (!description || judges.length === 0 || milestones.length === 0 || !stake) {
-      alert("Please fill in all fields");
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+    reset,
+  } = useForm<FormValues>({
+    defaultValues: {
+      description: "",
+      judges: [{ address: "" }],
+      milestones: [{ description: "" }],
+      requiredApprovals: 1,
+      stake: "",
+    },
+  });
 
+  const {
+    fields: judgeFields,
+    append: appendJudge,
+    remove: removeJudge,
+  } = useFieldArray({
+    control,
+    name: "judges",
+  });
+
+  const {
+    fields: milestoneFields,
+    append: appendMilestone,
+    remove: removeMilestone,
+  } = useFieldArray({
+    control,
+    name: "milestones",
+  });
+
+  const requiredApprovals = watch("requiredApprovals");
+
+  const onSubmit: SubmitHandler<FormValues> = async data => {
     try {
       await writeContractAsync({
         functionName: "createGoal",
-        args: [description, judges, milestones, requiredApprovals],
-        value: parseEther(stake),
+        args: [
+          data.description,
+          data.judges.map(judge => judge.address),
+          data.milestones.map(milestone => milestone.description),
+          data.requiredApprovals,
+        ],
+        value: parseEther(data.stake),
       });
-      alert("Goal created successfully!");
+      notification.success("Goal created successfully!");
+      reset();
     } catch (error) {
       console.error("Error creating goal:", error);
-      alert("Error creating goal. Check console for details.");
+      notification.error("Error creating goal. Check console for details.");
     }
   };
-
-  const handleRequiredApprovalsChange = (value: string) => {
-    const parsedValue = parseInt(value || "1");
-    const newValue = Math.min(Math.max(1, parsedValue), judges.length);
-    setRequiredApprovals(newValue);
-  };
-
-  function handleAddJudge() {
-    setJudges([...judges, ""]);
-  }
-
-  function handleRemoveJudge(index: number) {
-    const newJudges = judges.filter((_, i) => i !== index);
-    setJudges(newJudges);
-    if (requiredApprovals > newJudges.length) {
-      setRequiredApprovals(newJudges.length);
-    }
-  }
-
-  function handleJudgeChange(index: number, value: string) {
-    const newJudges = [...judges];
-    newJudges[index] = value;
-    setJudges(newJudges);
-  }
-
-  function handleAddMilestone() {
-    setMilestones([...milestones, ""]);
-  }
-
-  function handleRemoveMilestone(index: number) {
-    setMilestones(milestones.filter((_, i) => i !== index));
-  }
-
-  function handleMilestoneChange(index: number, value: string) {
-    const newMilestones = [...milestones];
-    newMilestones[index] = value;
-    setMilestones(newMilestones);
-  }
 
   return (
-    <section className="mb-4 space-y-6 border border-base-content rounded-xl p-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="mb-4 space-y-6 border border-base-content rounded-xl p-4">
       <h2 className="text-xl font-semibold mb-2">Create New Goal</h2>
 
       <div className="space-y-4">
-        <InputBase
-          name="goal-description"
-          label="Goal Description"
-          placeholder="Write your goal here"
-          value={description}
-          onChange={setDescription}
+        <Controller
+          name="description"
+          control={control}
+          rules={{ required: "Goal description is required" }}
+          render={({ field }) => (
+            <InputBase
+              {...field}
+              label="Goal Description"
+              placeholder="Write your goal here"
+              error={!!errors.description}
+              errorMessage={errors.description?.message}
+            />
+          )}
         />
-        <EtherInput name="stake" label="Stake (in ETH)" value={stake} onChange={setStake} />
+
+        <Controller
+          name="stake"
+          control={control}
+          rules={{ required: "Stake is required" }}
+          render={({ field }) => (
+            <EtherInput {...field} label="Stake (in ETH)" error={!!errors.stake} errorMessage={errors.stake?.message} />
+          )}
+        />
+
         <div className="space-y-2">
           <h3 className="text-lg font-medium">Judges</h3>
-          {judges.map((judge, index) => (
-            <div key={index} className="flex items-end space-x-2">
-              <AddressInput
-                name={`judge-address-${index}`}
-                label={`Judge Address ${index + 1}`}
-                placeholder="Enter judge address"
-                value={judge}
-                onChange={value => handleJudgeChange(index, value)}
+          {judgeFields.map((field, index) => (
+            <div key={field.id} className="flex items-end space-x-2">
+              <Controller
+                name={`judges.${index}.address`}
+                control={control}
+                rules={{ required: "Judge address is required" }}
+                render={({ field }) => (
+                  <AddressInput
+                    {...field}
+                    label={`Judge Address ${index + 1}`}
+                    placeholder="Enter judge address"
+                    error={!!errors.judges?.[index]?.address}
+                    errorMessage={errors.judges?.[index]?.address?.message}
+                  />
+                )}
               />
-              <button onClick={() => handleRemoveJudge(index)} className="btn btn-error btn-sm mb-1">
+              <button type="button" onClick={() => removeJudge(index)} className="btn btn-error btn-sm mb-1">
                 Remove
               </button>
             </div>
           ))}
-          <button onClick={handleAddJudge} className="btn btn-secondary btn-sm">
+          <button type="button" onClick={() => appendJudge({ address: "" })} className="btn btn-secondary btn-sm">
             Add Judge
           </button>
         </div>
 
         <div className="grid grid-cols-[200px_70px_70px] items-end gap-2">
-          <InputBase
-            name="required-approvals"
-            label="Required Approvals"
-            value={requiredApprovals.toString()}
-            onChange={handleRequiredApprovalsChange}
+          <Controller
+            name="requiredApprovals"
+            control={control}
+            rules={{
+              required: "Required approvals is required",
+              min: { value: 1, message: "Minimum required approvals is 1" },
+              max: { value: judgeFields.length, message: `Maximum required approvals is ${judgeFields.length}` },
+            }}
+            render={({ field }) => (
+              <InputBase
+                {...field}
+                label="Required Approvals"
+                error={!!errors.requiredApprovals}
+                errorMessage={errors.requiredApprovals?.message}
+              />
+            )}
           />
           <button
+            type="button"
             className="btn btn-xs btn-primary mb-2"
-            onClick={() => handleRequiredApprovalsChange(Math.max(1, requiredApprovals - 1).toString())}
+            onClick={() => setValue("requiredApprovals", Math.max(1, requiredApprovals - 1))}
           >
             <MinusIcon className="h-4 w-4" />
           </button>
           <button
+            type="button"
             className="btn btn-xs btn-primary mb-2"
-            onClick={() => handleRequiredApprovalsChange((requiredApprovals + 1).toString())}
+            onClick={() => setValue("requiredApprovals", Math.min(judgeFields.length, requiredApprovals + 1))}
           >
             <PlusIcon className="h-4 w-4" />
           </button>
@@ -127,28 +167,39 @@ export const GoalForm = () => {
 
         <div className="space-y-2">
           <h3 className="text-lg font-medium">Milestones</h3>
-          {milestones.map((milestone, index) => (
-            <div key={index} className="flex items-end space-x-2">
-              <InputBase
-                name={`milestone-${index}`}
-                label={`Milestone ${index + 1}`}
-                placeholder="Enter milestone"
-                value={milestone}
-                onChange={value => handleMilestoneChange(index, value)}
+          {milestoneFields.map((field, index) => (
+            <div key={field.id} className="flex items-end space-x-2">
+              <Controller
+                name={`milestones.${index}.description`}
+                control={control}
+                rules={{ required: "Milestone description is required" }}
+                render={({ field }) => (
+                  <InputBase
+                    {...field}
+                    label={`Milestone ${index + 1}`}
+                    placeholder="Enter milestone"
+                    error={!!errors.milestones?.[index]?.description}
+                    errorMessage={errors.milestones?.[index]?.description?.message}
+                  />
+                )}
               />
-              <button onClick={() => handleRemoveMilestone(index)} className="btn btn-error btn-sm mb-1">
+              <button type="button" onClick={() => removeMilestone(index)} className="btn btn-error btn-sm mb-1">
                 Remove
               </button>
             </div>
           ))}
-          <button onClick={handleAddMilestone} className="btn btn-secondary btn-sm">
+          <button
+            type="button"
+            onClick={() => appendMilestone({ description: "" })}
+            className="btn btn-secondary btn-sm"
+          >
             Add Milestone
           </button>
         </div>
       </div>
-      <button onClick={handleCreateGoal} className="btn btn-primary ">
+      <button type="submit" className="btn btn-primary">
         Create Goal
       </button>
-    </section>
+    </form>
   );
 };
