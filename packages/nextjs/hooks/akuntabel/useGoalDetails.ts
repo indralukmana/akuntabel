@@ -1,10 +1,38 @@
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useScaffoldReadContract, useScaffoldWatchContractEvent } from "~~/hooks/scaffold-eth";
 
 export const useGoalDetails = (goalId: bigint) => {
-  const { data: goalDetailsData, isLoading } = useScaffoldReadContract({
+  const {
+    data: goalDetailsData,
+    isLoading,
+    refetch,
+  } = useScaffoldReadContract({
     contractName: "Akuntabel",
     functionName: "getGoalDetails",
     args: [goalId],
+  });
+
+  useScaffoldWatchContractEvent({
+    contractName: "Akuntabel",
+    eventName: "MilestoneAchieved",
+    onLogs: logs => {
+      logs.forEach(log => {
+        if (log.args.goalId === goalId) {
+          refetch();
+        }
+      });
+    },
+  });
+
+  useScaffoldWatchContractEvent({
+    contractName: "Akuntabel",
+    eventName: "GoalApproved",
+    onLogs: logs => {
+      logs.forEach(log => {
+        if (log.args.goalId === goalId) {
+          refetch();
+        }
+      });
+    },
   });
 
   const goalDetails = {

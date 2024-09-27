@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
 
 type MilestoneModalProps = {
   goalDescription: string;
@@ -73,7 +74,9 @@ export function GoalMilestones({
         args: [goalId, BigInt(index)],
         functionName: "achieveMilestone",
       });
+      notification.success("Milestone finished successfully!");
     } catch (error) {
+      notification.error("Error finishing milestone. Check console for details.");
       console.error(error);
     }
   };
