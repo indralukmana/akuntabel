@@ -2,9 +2,8 @@
 
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
-import { GoalForm } from "~~/components/akuntabel/GoalForm";
-import { GoalsList } from "~~/components/akuntabel/GoalsList";
 import { Hero } from "~~/components/akuntabel/Hero";
+import { HomeDashboard } from "~~/components/akuntabel/HomeDashboard";
 
 const Home: NextPage = () => {
   const { address, isConnecting, isReconnecting } = useAccount();
@@ -16,8 +15,7 @@ const Home: NextPage = () => {
       {!address && <Hero />}
       {!isLoadingAddress && address && (
         <>
-          <GoalForm address={address} />
-          <GoalsList address={address} />
+          <HomeDashboard />
         </>
       )}
     </div>

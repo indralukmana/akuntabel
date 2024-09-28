@@ -99,7 +99,7 @@ export const GoalsList = ({ address }: { address: AddressType }) => {
           {Array.from({ length: Number(goalNonce) }).map((_, index) => {
             const goalHash = getGoalHash(address, index);
             return (
-              <li key={index}>
+              <li key={index} className="transform transition-all duration-300 animate-fade-in-up">
                 <Link href={`/goals/${goalHash}`}>
                   <GoalSummary goalHash={goalHash} />
                 </Link>

@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BugAntIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, ListBulletIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 
 type HeaderMenuLink = {
@@ -17,11 +17,17 @@ export const menuLinks: HeaderMenuLink[] = [
   {
     label: "Home",
     href: "/",
+    icon: <HomeIcon className="w-4 h-4" />,
   },
   {
-    label: "Debug Contracts",
-    href: "/debug",
-    icon: <BugAntIcon className="h-4 w-4" />,
+    label: "Goals",
+    href: "/goals",
+    icon: <ListBulletIcon className="w-4 h-4" />,
+  },
+  {
+    label: "Create Goal",
+    href: "/goals/create",
+    icon: <PlusCircleIcon className="w-4 h-4" />,
   },
 ];
 
@@ -38,7 +44,7 @@ export const HeaderMenuLinks = () => {
               href={href}
               passHref
               className={`${
-                isActive ? "bg-secondary shadow-md" : ""
+                isActive ? "bg-secondary shadow-md" : "bg-accent"
               } hover:bg-secondary hover:shadow-md focus:!bg-secondary active:!text-neutral py-1.5 px-3 text-sm rounded-full gap-2 grid grid-flow-col`}
             >
               {icon}
@@ -57,7 +63,7 @@ export const HeaderMenuLinks = () => {
 export const Header = () => {
   return (
     <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-md shadow-secondary px-2 flex w-full">
-      <div className="w-auto lg:w-1/2">
+      <div className="">
         <Link href="/" passHref className="flex items-center gap-2 ml-4 mr-6 shrink-0">
           <div className="flex relative w-10 h-10">
             <Image alt="Akuntabel logo" className="cursor-pointer" fill src="/logo.svg" />
@@ -68,6 +74,9 @@ export const Header = () => {
           </h1>
         </Link>
       </div>
+      <ul className="menu menu-horizontal flex-1 md:space-x-4">
+        <HeaderMenuLinks />
+      </ul>
       <div className="flex flex-col-reverse md:flex-row gap-2">
         <RainbowKitCustomConnectButton />
         <FaucetButton />

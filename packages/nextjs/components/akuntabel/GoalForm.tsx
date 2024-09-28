@@ -39,7 +39,7 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
       judges: [{ address: "" }],
       milestones: [{ description: "" }],
       requiredApprovals: 1,
-      stake: "",
+      stake: "0.01",
     },
   });
 
@@ -86,7 +86,7 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
 
   return (
     <form onSubmit={onSubmit} className="card w-full bg-base-100 shadow-xl overflow-hidden min-h-[770px]">
-      <h2 className="m-0 card-title justify-center md:text-2xl p-6 font-bold flex items-center bg-blue-400 dark:bg-primary text-primary-content flex-col md:flex-row gap-4">
+      <h2 className="m-0 card-title justify-center md:text-2xl p-6 font-bold flex items-center bg-blue-400 dark:bg-primary text-primary-content flex-col md:flex-row gap-2">
         <Bow width={32} height={32} />
         <span>Create Your</span> <span>Ambitious Goal</span>
         <Target2 width={32} height={32} />
@@ -188,7 +188,7 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
         <div className="flex-1 flex flex-col justify-between">
           <div>
             <h3 className="label-text font-semibold text-lg">Judges</h3>
-            <ul className="space-y-2 list-none max-h-[420px] overflow-y-auto">
+            <ul className="space-y-2 list-none max-h-[420px] overflow-y-auto overflow-x-hidden">
               {judgeFields.map((field, index) => (
                 <li key={field.id}>
                   <div className="w-full flex flex-col items-center">
@@ -237,7 +237,7 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
         <section className="flex-1 flex flex-col justify-between">
           <div className="flex flex-col space-y-2">
             <h3 className="label font-semibold text-lg p-0 m-0">Milestones</h3>
-            <ol className="space-y-2 list-none max-h-[420px] overflow-y-auto">
+            <ol className="space-y-2 list-none max-h-[420px] overflow-y-auto overflow-x-hidden">
               {milestoneFields.map((field, index) => (
                 <li key={field.id} className="flex items-end space-x-2">
                   <div className="w-full flex flex-col items-center">
@@ -287,7 +287,7 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
       </div>
       <div className="card-actions p-8 flex justify-center w-full">
         <button type="submit" className="btn btn-primary w-full text-xl" disabled={isCreatingGoal}>
-          {isCreatingGoal ? "Creating Goal..." : "Create Goal  🚀"}
+          {isCreatingGoal ? "Creating Goal..." : "✨ Create Goal ✨"}
         </button>
       </div>
     </form>
