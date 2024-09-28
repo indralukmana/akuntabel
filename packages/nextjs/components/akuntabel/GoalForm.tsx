@@ -1,11 +1,13 @@
 import React from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { Address, parseEther } from "viem";
+import { Address as AddressType, parseEther } from "viem";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
+import { NetworkInfo } from "~~/components/NetworkInfo";
+import { RandomMotivation } from "~~/components/akuntabel/RandomMotivation";
 import { Bow } from "~~/components/icons/Bow";
 import { Target2 } from "~~/components/icons/Target2";
-import { AddressInput, InputBase } from "~~/components/scaffold-eth";
+import { Address, AddressInput, Balance, InputBase } from "~~/components/scaffold-eth";
 import { useGoalNonce } from "~~/hooks/akuntabel/useGoalNonce";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
@@ -18,7 +20,7 @@ interface FormValues {
   stake: string;
 }
 
-export const GoalForm = ({ address }: { address: Address }) => {
+export const GoalForm = ({ address }: { address: AddressType }) => {
   const { writeContractAsync, isMining } = useScaffoldWriteContract("Akuntabel");
   const { isLoadingGoalNonce, refetchGoalNonce } = useGoalNonce(address);
 
@@ -83,15 +85,23 @@ export const GoalForm = ({ address }: { address: Address }) => {
   });
 
   return (
-    <form onSubmit={onSubmit} className="card w-full bg-base-100 shadow-xl overflow-hidden">
-      <h2 className="card-title justify-center text-2xl p-6 font-bold flex items-center bg-blue-400 dark:bg-primary text-primary-content">
+    <form onSubmit={onSubmit} className="card w-full bg-base-100 shadow-xl overflow-hidden min-h-[770px]">
+      <h2 className="m-0 card-title justify-center md:text-2xl p-6 font-bold flex items-center bg-blue-400 dark:bg-primary text-primary-content flex-col md:flex-row gap-4">
         <Bow width={32} height={32} />
-        Create Your Ambitious Goal
+        <span>Create Your</span> <span>Ambitious Goal</span>
         <Target2 width={32} height={32} />
       </h2>
 
-      <div className="card-body">
-        <div className="space-y-6">
+      <div className="card-body flex flex-col md:flex-row w-full ">
+        <div className="flex-1 flex flex-col space-y-4">
+          <div className="flex items-center justify-between flex-col md:flex-row">
+            <Address address={address} format="short" />
+            <Balance address={address} />
+            <NetworkInfo />
+          </div>
+          <div className="flex-1">
+            <RandomMotivation />
+          </div>
           <Controller
             name="description"
             control={control}
@@ -136,56 +146,9 @@ export const GoalForm = ({ address }: { address: Address }) => {
               </div>
             )}
           />
-
-          <section className="space-y-4 w-full">
-            <h3 className="label-text font-semibold text-lg">Judges</h3>
-            <ul className="space-y-2 list-none">
-              {judgeFields.map((field, index) => (
-                <li key={field.id}>
-                  <div className="w-full flex flex-col items-center">
-                    <Controller
-                      name={`judges.${index}.address`}
-                      control={control}
-                      rules={{ required: "Judge address is required" }}
-                      render={({ field }) => (
-                        <div className="flex flex-col items-center w-full">
-                          <label className="sr-only" htmlFor={field.name}>
-                            Judge Address {index + 1}
-                          </label>
-                          <div className="flex items-center space-x-2 w-full">
-                            <AddressInput
-                              {...field}
-                              placeholder={`Judge ${index + 1} Address `}
-                              error={!!errors.judges?.[index]?.address}
-                            />
-                            {judgeFields.length > 1 && (
-                              <button type="button" onClick={() => removeJudge(index)} className="btn btn-error btn-sm">
-                                <TrashIcon className="h-4 w-4" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    />
-                    {errors.judges?.[index]?.address?.message && (
-                      <p className="text-warning text-sm">{errors.judges?.[index]?.address?.message}</p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              onClick={() => appendJudge({ address: "" })}
-              className="btn btn-secondary btn-square w-full rounded-full"
-            >
-              Add Another Judge
-            </button>
-          </section>
-
-          <div className="form-control">
+          <div>
             <label className="label font-semibold text-lg">Required Approvals</label>
-            <div className="flex items-center justify-center space-x-4 bg-blue-400 dark:bg-neutral-400 p-4 rounded-lg">
+            <div className="flex items-center justify-center space-x-4 bg-accent p-4 rounded-lg">
               <button
                 type="button"
                 className="btn rounded-lg btn-square btn-sm"
@@ -223,10 +186,62 @@ export const GoalForm = ({ address }: { address: Address }) => {
               </button>
             </div>
           </div>
+        </div>
+        <div className="divider md:divider-horizontal" />
 
-          <div className="space-y-4">
-            <h3 className="label font-semibold text-lg">Milestones</h3>
-            <ol className="space-y-2">
+        <div className="flex-1 flex flex-col justify-between">
+          <div>
+            <h3 className="label-text font-semibold text-lg">Judges</h3>
+            <ul className="space-y-2 list-none max-h-[420px] overflow-y-auto">
+              {judgeFields.map((field, index) => (
+                <li key={field.id}>
+                  <div className="w-full flex flex-col items-center">
+                    <Controller
+                      name={`judges.${index}.address`}
+                      control={control}
+                      rules={{ required: "Judge address is required" }}
+                      render={({ field }) => (
+                        <div className="flex flex-col items-center w-full">
+                          <label className="sr-only" htmlFor={field.name}>
+                            Judge Address {index + 1}
+                          </label>
+                          <div className="flex items-center space-x-2 w-full">
+                            <AddressInput
+                              {...field}
+                              placeholder={`Judge ${index + 1} Address `}
+                              error={!!errors.judges?.[index]?.address}
+                            />
+                            {judgeFields.length > 1 && (
+                              <button type="button" onClick={() => removeJudge(index)} className="btn btn-error btn-sm">
+                                <TrashIcon className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    />
+                    {errors.judges?.[index]?.address?.message && (
+                      <p className="text-warning text-sm">{errors.judges?.[index]?.address?.message}</p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <button
+            type="button"
+            onClick={() => appendJudge({ address: "" })}
+            className="btn btn-secondary w-full rounded-full text-lg mt-2 md:mt-0"
+          >
+            Add Another Judge
+          </button>
+        </div>
+
+        <div className="divider md:divider-horizontal" />
+        <section className="flex-1 flex flex-col justify-between">
+          <div className="flex flex-col space-y-2">
+            <h3 className="label font-semibold text-lg p-0 m-0">Milestones</h3>
+            <ol className="space-y-2 list-none max-h-[420px] overflow-y-auto">
               {milestoneFields.map((field, index) => (
                 <li key={field.id} className="flex items-end space-x-2">
                   <div className="w-full flex flex-col items-center">
@@ -264,21 +279,20 @@ export const GoalForm = ({ address }: { address: Address }) => {
                 </li>
               ))}
             </ol>
-            <button
-              type="button"
-              onClick={() => appendMilestone({ description: "" })}
-              className="btn btn-secondary btn-sm"
-            >
-              Add Milestone
-            </button>
           </div>
-        </div>
-
-        <div className="card-actions justify-end mt-6">
-          <button type="submit" className="btn btn-primary" disabled={isCreatingGoal}>
-            {isCreatingGoal ? "Creating Goal..." : "Create Goal"}
+          <button
+            type="button"
+            onClick={() => appendMilestone({ description: "" })}
+            className="btn btn-secondary w-full rounded-full text-lg mt-2 md:mt-0"
+          >
+            Add Milestone
           </button>
-        </div>
+        </section>
+      </div>
+      <div className="card-actions p-8 flex justify-center w-full">
+        <button type="submit" className="btn btn-primary w-full text-xl" disabled={isCreatingGoal}>
+          {isCreatingGoal ? "Creating Goal..." : "Create Goal  🚀"}
+        </button>
       </div>
     </form>
   );

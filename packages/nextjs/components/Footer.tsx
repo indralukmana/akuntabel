@@ -17,7 +17,7 @@ export const Footer = () => {
   const isLocalNetwork = targetNetwork.id === hardhat.id;
 
   return (
-    <div className="bg-base-100 shadow-md shadow-secondary sticky flex justify-between items-center w-full z-10 p-4 bottom-0 left-0 text-sm">
+    <div className="bg-base-100 shadow-md shadow-secondary sticky flex flex-col space-y-2 md:space-y-0 md:flex-row justify-between items-center w-full z-10 p-4 bottom-0 left-0 text-sm">
       <a
         href="https://github.com/indralukmana/akuntabel"
         target="_blank"
