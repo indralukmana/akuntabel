@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { NextPage } from "next";
 import { Hex, isHex } from "viem";
-import GoalApproval from "~~/components/akuntabel/GoalApproval";
 import { GoalDetails } from "~~/components/akuntabel/GoalDetails";
 
 type GoalPageProps = {
@@ -20,8 +19,7 @@ const GoalPage: NextPage<GoalPageProps> = ({ params }) => {
   }
   return (
     <div className="container mx-auto p-4 space-y-8">
-      <h1 className="text-2xl font-bold ">Goal Details</h1>
-      <GoalApproval goalHash={goalHash} />
+      {/* <GoalApproval goalHash={goalHash} /> */}
       <GoalDetails goalHash={goalHash} />
     </div>
   );

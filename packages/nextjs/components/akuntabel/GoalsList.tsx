@@ -27,14 +27,16 @@ const GoalSummary = ({ goalHash }: { goalHash: Hex }) => {
   } = goalDetails;
 
   const milestonesCount = milestoneDescriptions.length;
-  const milestonesCompleted = milestoneAchieved.every(achieved => achieved);
+  const milestonesCompleted = milestoneAchieved?.filter(Boolean).length ?? 0;
+
+  const isCompleted = milestonesCompleted === milestonesCount;
 
   return (
     <section className="card bg-base-100 overflow-hidden">
       <div className="p-4 flex justify-center bg-secondary">
         <h5 className="text-lg font-semibold">{description}</h5>
       </div>
-      <div className="card-body grid grid-cols-4 w-full items-center">
+      <div className="card-body grid grid-cols-5 w-full items-center">
         <p className="flex gap-2 items-center justify-center">
           <strong className="text-lg font-semibold">Stake:</strong>{" "}
           <span className="badge badge-secondary badge-lg">ETH {stake ? formatEther(stake) : ""}</span>
@@ -59,14 +61,20 @@ const GoalSummary = ({ goalHash }: { goalHash: Hex }) => {
             {fundsReleased ? "Released" : "Locked"}
           </span>
         </p>
+        <p className="flex items-center justify-center gap-2">
+          <strong className="text-lg font-semibold">Milestones:</strong>
+          <span>
+            {milestonesCompleted} / {milestonesCount}
+          </span>
+        </p>
       </div>
       <div className="w-full p-6 bg-secondary">
         <progress
-          className={`progress  w-full ${milestonesCompleted ? "progress-success" : "progress-warning"}`}
-          value={milestonesCompleted ? milestonesCount : 0}
+          className={`progress p-0 m-0 w-full ${isCompleted ? "progress-success" : "progress-warning"}`}
+          value={milestonesCompleted}
           max={milestonesCount}
         >
-          {milestonesCompleted ? milestonesCount : 0} / {milestonesCount}
+          {milestonesCompleted} / {milestonesCount}
         </progress>
       </div>
     </section>
