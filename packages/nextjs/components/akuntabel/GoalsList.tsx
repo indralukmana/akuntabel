@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Address as AddressType, Hex, formatEther } from "viem";
+import { PersonalVision } from "~~/components/akuntabel/PersonalVision";
 import { RandomMotivation } from "~~/components/akuntabel/RandomMotivation";
 import { UserEthereum } from "~~/components/akuntabel/UserEthereum";
 import { Target2 } from "~~/components/icons/Target2";
@@ -90,9 +91,9 @@ export const GoalsList = ({ address }: { address: AddressType }) => {
     <div className="space-y-8">
       <div>
         <h3 className="text-5xl font-semibold mb-2 text-center p-4">✨ Your Awesome Goals ✨</h3>
-        <div className="card card-body bg-base-100 flex md:flex-row flex-col justify-between w-full">
+        <div className="card card-body bg-base-100 flex md:flex-row flex-col justify-between items-center w-full min-h-32">
           <UserEthereum address={address} />
-          <p className="text-right">Write Your Vision</p>
+          <PersonalVision address={address} />
         </div>
       </div>
 
