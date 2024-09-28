@@ -12,7 +12,6 @@ type InputBaseProps<T> = Partial<CommonInputProps<T>> & {
 export const InputBase = forwardRef<HTMLInputElement, InputBaseProps<string | bigint | Hex>>(
   (
     {
-      label,
       name,
       value,
       onChange,
@@ -24,6 +23,8 @@ export const InputBase = forwardRef<HTMLInputElement, InputBaseProps<string | bi
       suffix,
       reFocus,
       type = "text",
+      inputClassName,
+      wrapperClassName,
       ...rest
     },
     ref,
@@ -52,12 +53,13 @@ export const InputBase = forwardRef<HTMLInputElement, InputBaseProps<string | bi
     };
 
     return (
-      <div className="w-full">
-        <label htmlFor={name}>{label ?? name}</label>
+      <div className={`w-full ${wrapperClassName ? wrapperClassName : ""}`}>
         <div className={`flex border-2 border-base-300 bg-base-200 rounded-full text-accent ${modifier}`}>
           {prefix}
           <input
-            className="input input-ghost focus-within:border-transparent focus:outline-none focus:bg-transparent focus:text-gray-400 h-[2.2rem] min-h-[2.2rem] px-4 border w-full font-medium placeholder:text-accent/50 text-gray-400"
+            className={`input input-ghost focus-within:border-transparent focus:outline-none focus:bg-transparent focus:text-gray-400 h-[2.2rem] min-h-[2.2rem] px-4 border w-full font-medium placeholder:text-accent/50 text-gray-400 ${
+              inputClassName ? inputClassName : ""
+            }`}
             placeholder={placeholder}
             name={name}
             value={value?.toString()}

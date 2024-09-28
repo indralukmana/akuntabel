@@ -1,8 +1,11 @@
 import React from "react";
-import { Controller, SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Address, parseEther } from "viem";
+import { TrashIcon } from "@heroicons/react/20/solid";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
-import { AddressInput, EtherInput, InputBase } from "~~/components/scaffold-eth";
+import { Bow } from "~~/components/icons/Bow";
+import { Target2 } from "~~/components/icons/Target2";
+import { AddressInput, InputBase } from "~~/components/scaffold-eth";
 import { useGoalNonce } from "~~/hooks/akuntabel/useGoalNonce";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
@@ -58,7 +61,7 @@ export const GoalForm = ({ address }: { address: Address }) => {
 
   const requiredApprovals = watch("requiredApprovals");
 
-  const onSubmit: SubmitHandler<FormValues> = async data => {
+  const onSubmit = handleSubmit(async data => {
     try {
       await writeContractAsync({
         functionName: "createGoal",
@@ -77,140 +80,206 @@ export const GoalForm = ({ address }: { address: Address }) => {
       console.error("Error creating goal:", error);
       notification.error("Error creating goal. Check console for details.");
     }
-  };
+  });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="mb-4 space-y-6 border border-base-content rounded-xl p-4">
-      <h2 className="text-xl font-semibold mb-2">Create New Goal</h2>
+    <form onSubmit={onSubmit} className="card w-full bg-base-100 shadow-xl overflow-hidden">
+      <h2 className="card-title justify-center text-2xl p-6 font-bold flex items-center bg-blue-400 dark:bg-primary text-primary-content">
+        <Bow width={32} height={32} />
+        Create Your Ambitious Goal
+        <Target2 width={32} height={32} />
+      </h2>
 
-      <div className="space-y-4">
-        <Controller
-          name="description"
-          control={control}
-          rules={{ required: "Goal description is required" }}
-          render={({ field }) => (
-            <InputBase
-              {...field}
-              label="Goal Description"
-              placeholder="Write your goal here"
-              error={!!errors.description}
-              errorMessage={errors.description?.message}
-            />
-          )}
-        />
-
-        <Controller
-          name="stake"
-          control={control}
-          rules={{ required: "Stake is required" }}
-          render={({ field }) => (
-            <EtherInput {...field} label="Stake (in ETH)" error={!!errors.stake} errorMessage={errors.stake?.message} />
-          )}
-        />
-
-        <div className="space-y-2">
-          <h3 className="text-lg font-medium">Judges</h3>
-          {judgeFields.map((field, index) => (
-            <div key={field.id} className="flex items-end space-x-2">
-              <Controller
-                name={`judges.${index}.address`}
-                control={control}
-                rules={{ required: "Judge address is required" }}
-                render={({ field }) => (
-                  <AddressInput
-                    {...field}
-                    label={`Judge Address ${index + 1}`}
-                    placeholder="Enter judge address"
-                    error={!!errors.judges?.[index]?.address}
-                    errorMessage={errors.judges?.[index]?.address?.message}
-                  />
-                )}
-              />
-              {judgeFields.length > 1 && (
-                <button type="button" onClick={() => removeJudge(index)} className="btn btn-error btn-sm mb-1">
-                  Remove
-                </button>
-              )}
-            </div>
-          ))}
-          <button type="button" onClick={() => appendJudge({ address: "" })} className="btn btn-secondary btn-sm">
-            Add Judge
-          </button>
-        </div>
-
-        <div className="grid grid-cols-[200px_70px_70px] items-end gap-2">
+      <div className="card-body">
+        <div className="space-y-6">
           <Controller
-            name="requiredApprovals"
+            name="description"
             control={control}
-            rules={{
-              required: "Required approvals is required",
-              min: { value: 1, message: "Minimum required approvals is 1" },
-              max: { value: judgeFields.length, message: `Maximum required approvals is ${judgeFields.length}` },
-            }}
-            render={({ field: { value, onChange, ...fieldProps } }) => (
-              <InputBase
-                {...fieldProps}
-                label="Required Approvals"
-                error={!!errors.requiredApprovals}
-                errorMessage={errors.requiredApprovals?.message}
-                onChange={newValue => onChange(Number(newValue))}
-                value={value.toString()}
-              />
+            rules={{ required: "Goal description is required" }}
+            render={({ field }) => (
+              <div className="form-control">
+                <label className="label" htmlFor={field.name}>
+                  <span className="label-text font-semibold text-lg">What is your ambitious goal?</span>
+                </label>
+                <InputBase
+                  {...field}
+                  placeholder="e.g. I want to run every day for 100 days"
+                  error={!!errors.description}
+                  errorMessage={errors.description?.message}
+                />
+              </div>
             )}
           />
-          <button
-            type="button"
-            className="btn btn-xs btn-primary mb-2"
-            onClick={() => setValue("requiredApprovals", Math.max(1, requiredApprovals - 1))}
-          >
-            <MinusIcon className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            className="btn btn-xs btn-primary mb-2"
-            onClick={() => setValue("requiredApprovals", Math.min(judgeFields.length, requiredApprovals + 1))}
-          >
-            <PlusIcon className="h-4 w-4" />
-          </button>
-        </div>
-
-        <div className="space-y-2">
-          <h3 className="text-lg font-medium">Milestones</h3>
-          {milestoneFields.map((field, index) => (
-            <div key={field.id} className="flex items-end space-x-2">
-              <Controller
-                name={`milestones.${index}.description`}
-                control={control}
-                rules={{ required: "Milestone description is required" }}
-                render={({ field }) => (
-                  <InputBase
+          <Controller
+            name="stake"
+            control={control}
+            rules={{ required: "Stake is required" }}
+            render={({ field }) => (
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold text-lg">Stake Amount</span>
+                </label>
+                <div className=" items-center justify-end grid grid-cols-[1fr_max-content] gap-2">
+                  <input
+                    type="range"
+                    min={0.01}
+                    max="1"
+                    step="0.01"
+                    className="range [--range-shdw:#627EEA]"
                     {...field}
-                    label={`Milestone ${index + 1}`}
-                    placeholder="Enter milestone"
-                    error={!!errors.milestones?.[index]?.description}
-                    errorMessage={errors.milestones?.[index]?.description?.message}
+                  />
+                  <div className="badge badge-primary badge-lg w-24 grid grid-cols-[max-content_1fr] items-center text-center">
+                    <span>ETH</span>
+                    {field.value}
+                  </div>
+                </div>
+              </div>
+            )}
+          />
+
+          <section className="space-y-4 w-full">
+            <h3 className="label-text font-semibold text-lg">Judges</h3>
+            <ul className="space-y-2 list-none">
+              {judgeFields.map((field, index) => (
+                <li key={field.id}>
+                  <div className="w-full flex flex-col items-center">
+                    <Controller
+                      name={`judges.${index}.address`}
+                      control={control}
+                      rules={{ required: "Judge address is required" }}
+                      render={({ field }) => (
+                        <div className="flex flex-col items-center w-full">
+                          <label className="sr-only" htmlFor={field.name}>
+                            Judge Address {index + 1}
+                          </label>
+                          <div className="flex items-center space-x-2 w-full">
+                            <AddressInput
+                              {...field}
+                              placeholder={`Judge ${index + 1} Address `}
+                              error={!!errors.judges?.[index]?.address}
+                            />
+                            {judgeFields.length > 1 && (
+                              <button type="button" onClick={() => removeJudge(index)} className="btn btn-error btn-sm">
+                                <TrashIcon className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    />
+                    {errors.judges?.[index]?.address?.message && (
+                      <p className="text-warning text-sm">{errors.judges?.[index]?.address?.message}</p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              onClick={() => appendJudge({ address: "" })}
+              className="btn btn-secondary btn-square w-full rounded-full"
+            >
+              Add Another Judge
+            </button>
+          </section>
+
+          <div className="form-control">
+            <label className="label font-semibold text-lg">Required Approvals</label>
+            <div className="flex items-center justify-center space-x-4 bg-blue-400 dark:bg-neutral-400 p-4 rounded-lg">
+              <button
+                type="button"
+                className="btn rounded-lg btn-square btn-sm"
+                onClick={() => setValue("requiredApprovals", Math.max(1, requiredApprovals - 1))}
+              >
+                <MinusIcon className="h-4 w-4" />
+              </button>
+              <Controller
+                name="requiredApprovals"
+                control={control}
+                rules={{
+                  required: "Required approvals is required",
+                  min: { value: 1, message: "Minimum required approvals is 1" },
+                  max: { value: judgeFields.length, message: `Maximum required approvals is ${judgeFields.length}` },
+                }}
+                render={({ field: { value, onChange, ...fieldProps } }) => (
+                  <InputBase
+                    {...fieldProps}
+                    error={!!errors.requiredApprovals}
+                    errorMessage={errors.requiredApprovals?.message}
+                    onChange={newValue => onChange(Number(newValue))}
+                    value={value.toString()}
+                    wrapperClassName="!w-20"
+                    inputClassName="text-center"
                   />
                 )}
               />
-              {milestoneFields.length > 1 && (
-                <button type="button" onClick={() => removeMilestone(index)} className="btn btn-error btn-sm mb-1">
-                  Remove
-                </button>
-              )}
+
+              <button
+                type="button"
+                className="btn rounded-lg btn-square btn-sm"
+                onClick={() => setValue("requiredApprovals", Math.min(judgeFields.length, requiredApprovals + 1))}
+              >
+                <PlusIcon className="h-4 w-4" />
+              </button>
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => appendMilestone({ description: "" })}
-            className="btn btn-secondary btn-sm"
-          >
-            Add Milestone
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="label font-semibold text-lg">Milestones</h3>
+            <ol className="space-y-2">
+              {milestoneFields.map((field, index) => (
+                <li key={field.id} className="flex items-end space-x-2">
+                  <div className="w-full flex flex-col items-center">
+                    <Controller
+                      name={`milestones.${index}.description`}
+                      control={control}
+                      rules={{ required: "Milestone description is required" }}
+                      render={({ field }) => (
+                        <div className="flex items-center space-x-2 w-full">
+                          <div className="badge badge-accent badge-lg">{index + 1}</div>
+                          <label className="sr-only" htmlFor={field.name}>
+                            Milestone {index + 1}
+                          </label>
+                          <InputBase
+                            {...field}
+                            placeholder={`Enter milestone ${index + 1}`}
+                            error={!!errors.milestones?.[index]?.description}
+                          />
+                          {milestoneFields.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeMilestone(index)}
+                              className="btn btn-error btn-sm"
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    />
+                    {errors.milestones?.[index]?.description?.message && (
+                      <p className="text-warning text-sm">{errors.milestones?.[index]?.description?.message}</p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <button
+              type="button"
+              onClick={() => appendMilestone({ description: "" })}
+              className="btn btn-secondary btn-sm"
+            >
+              Add Milestone
+            </button>
+          </div>
+        </div>
+
+        <div className="card-actions justify-end mt-6">
+          <button type="submit" className="btn btn-primary" disabled={isCreatingGoal}>
+            {isCreatingGoal ? "Creating Goal..." : "Create Goal"}
           </button>
         </div>
       </div>
-      <button type="submit" className="btn btn-primary" disabled={isCreatingGoal}>
-        {isCreatingGoal ? "Creating Goal..." : "Create Goal"}
-      </button>
     </form>
   );
 };
