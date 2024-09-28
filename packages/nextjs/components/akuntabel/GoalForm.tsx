@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Address as AddressType, parseEther } from "viem";
 import { TrashIcon } from "@heroicons/react/20/solid";
@@ -10,6 +11,7 @@ import { Target2 } from "~~/components/icons/Target2";
 import { AddressInput, InputBase } from "~~/components/scaffold-eth";
 import { useGoalNonce } from "~~/hooks/akuntabel/useGoalNonce";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { getGoalHash } from "~~/utils/akutabel/getGoalHash";
 import { notification } from "~~/utils/scaffold-eth";
 
 interface FormValues {
@@ -28,6 +30,7 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
 
   const {
     control,
+    trigger,
     handleSubmit,
     watch,
     setValue,
@@ -52,6 +55,13 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
     name: "judges",
   });
 
+  // Add this function to check for duplicate addresses
+  const isDuplicateAddress = (judgeAddress: string, index: number) => {
+    return judgeFields.some(
+      (field, idx) => idx !== index && field.address.toLowerCase() === judgeAddress.toLowerCase(),
+    );
+  };
+
   const {
     fields: milestoneFields,
     append: appendMilestone,
@@ -75,8 +85,21 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
         ],
         value: parseEther(data.stake),
       });
-      await refetchGoalNonce();
-      notification.success("Goal created successfully!");
+      const { data: goalNonce } = await refetchGoalNonce();
+      const goalHash = getGoalHash(address, Number(goalNonce) - 1);
+      const successToast = notification.success(
+        <div className="grid grid-cols-[max-content_max-content] gap-2 w-full items-center">
+          <p>Goal Created 🚀</p>
+          <Link
+            href={`/goals/${goalHash}`}
+            onClick={() => notification.remove(successToast)}
+            className="btn btn-primary btn-sm"
+          >
+            View Goal
+          </Link>
+        </div>,
+        { duration: 10000 },
+      );
       reset();
     } catch (error) {
       console.error("Error creating goal:", error);
@@ -195,7 +218,10 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
                     <Controller
                       name={`judges.${index}.address`}
                       control={control}
-                      rules={{ required: "Judge address is required" }}
+                      rules={{
+                        required: "Judge address is required",
+                        validate: value => !isDuplicateAddress(value, index) || "Duplicate judge address",
+                      }}
                       render={({ field }) => (
                         <div className="flex flex-col items-center w-full">
                           <label className="sr-only" htmlFor={field.name}>
@@ -208,7 +234,14 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
                               error={!!errors.judges?.[index]?.address}
                             />
                             {judgeFields.length > 1 && (
-                              <button type="button" onClick={() => removeJudge(index)} className="btn btn-error btn-sm">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  removeJudge(index);
+                                  trigger("judges");
+                                }}
+                                className="btn btn-error btn-sm"
+                              >
                                 <TrashIcon className="h-4 w-4" />
                               </button>
                             )}
@@ -259,7 +292,10 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
                           {milestoneFields.length > 1 && (
                             <button
                               type="button"
-                              onClick={() => removeMilestone(index)}
+                              onClick={() => {
+                                removeMilestone(index);
+                                trigger("milestones");
+                              }}
                               className="btn btn-error btn-sm"
                             >
                               <TrashIcon className="h-4 w-4" />

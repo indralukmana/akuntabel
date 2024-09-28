@@ -76,6 +76,8 @@ const GoalSummary = ({ goalHash }: { goalHash: Hex }) => {
 export const GoalsList = ({ address }: { address: AddressType }) => {
   const { goalNonce } = useGoalNonce(address);
 
+  const goalCount = Number(goalNonce);
+
   return (
     <div className="space-y-8">
       <div>
@@ -96,7 +98,7 @@ export const GoalsList = ({ address }: { address: AddressType }) => {
           Your Epic Goals
         </h4>
         <ul className="space-y-4">
-          {Array.from({ length: Number(goalNonce) }).map((_, index) => {
+          {Array.from({ length: goalCount }).map((_, index) => {
             const goalHash = getGoalHash(address, index);
             return (
               <li key={index} className="transform transition-all duration-300 animate-fade-in-up">
@@ -106,6 +108,17 @@ export const GoalsList = ({ address }: { address: AddressType }) => {
               </li>
             );
           })}
+          {goalCount === 0 && (
+            <li>
+              <Link
+                href="/goals/create"
+                className="btn btn-primary btn-lg h-40 text-2xl font-bold rounded-2xl w-full flex flex-col items-center justify-center"
+              >
+                <p>No goals yet</p>
+                <p>Create one to start your journey 🚀</p>
+              </Link>
+            </li>
+          )}
         </ul>
       </section>
     </div>
