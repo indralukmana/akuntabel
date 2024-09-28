@@ -3,8 +3,9 @@
 import React from "react";
 import Link from "next/link";
 import { Address as AddressType, Hex, formatEther } from "viem";
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
-import { Address } from "~~/components/scaffold-eth";
+import { RandomMotivation } from "~~/components/akuntabel/RandomMotivation";
+import { UserEthereum } from "~~/components/akuntabel/UserEthereum";
+import { Target2 } from "~~/components/icons/Target2";
 import { useGoalDetails } from "~~/hooks/akuntabel/useGoalDetails";
 import { useGoalNonce } from "~~/hooks/akuntabel/useGoalNonce";
 import { getGoalHash } from "~~/utils/akutabel/getGoalHash";
@@ -14,43 +15,61 @@ const GoalSummary = ({ goalHash }: { goalHash: Hex }) => {
 
   if (!goalDetails) return null;
 
-  const { description, stake, requiredApprovals, currentApprovals, completed, fundsReleased } = goalDetails;
+  const {
+    description,
+    stake,
+    requiredApprovals,
+    currentApprovals,
+    completed,
+    fundsReleased,
+    milestoneDescriptions,
+    milestoneAchieved,
+  } = goalDetails;
+
+  const milestonesCount = milestoneDescriptions.length;
+  const milestonesCompleted = milestoneAchieved.every(achieved => achieved);
 
   return (
-    <div className="grid grid-rows-4 md:grid-rows-1 grid-cols-1 md:grid-cols-4 border border-base-content p-4 rounded-lg items-center divide-x-2 gap-2">
-      <div className="h-full p-2">
-        <p className="flex flex-col">
-          <strong>Description:</strong> {description}
-        </p>
-        <p>
-          <strong>Stake:</strong> {stake ? formatEther(stake) : ""} ETH
-        </p>
+    <section className="card bg-base-100 overflow-hidden">
+      <div className="p-4 flex justify-center bg-secondary">
+        <h5 className="text-lg font-semibold">{description}</h5>
       </div>
-      <div className="h-full p-2">
-        <p>
-          <strong>Required Approvals:</strong> {Number(requiredApprovals)}
+      <div className="card-body grid grid-cols-4 w-full items-center">
+        <p className="flex gap-2 items-center justify-center">
+          <strong className="text-lg font-semibold">Stake:</strong>{" "}
+          <span className="badge badge-secondary badge-lg">ETH {stake ? formatEther(stake) : ""}</span>
         </p>
-        <p>
-          <strong>Current Approvals:</strong> {Number(currentApprovals)}
+
+        <p className="flex gap-2 items-center justify-center">
+          <strong className="text-lg font-semibold">Approvals:</strong> {Number(currentApprovals)} /{" "}
+          {Number(requiredApprovals)} Needed
         </p>
-      </div>
-      <div className="h-full flex items-center justify-center gap-2 p-2">
-        <p className="flex items-center gap-2">
-          <strong>Completed:</strong>
+
+        <p className="flex items-center justify-center gap-2">
+          <strong className="text-lg font-semibold">Goal Status:</strong>
           {completed ? (
-            <CheckCircleIcon className="w-4 h-4 text-green-500" />
+            <span className="badge badge-success">Completed</span>
           ) : (
-            <XCircleIcon className="w-4 h-4 text-red-500" />
+            <span className="badge badge-warning">In Progress</span>
           )}
         </p>
-      </div>
-      <div className="h-full flex items-center justify-center gap-2 p-2">
-        <p className="flex items-center gap-2">
-          <strong>Funds Released:</strong>
-          <i>{fundsReleased ? "Released" : "Not Released"}</i>
+        <p className="flex items-center justify-center gap-2">
+          <strong className="text-lg font-semibold">Funds:</strong>
+          <span className={`${fundsReleased ? "text-success" : "text-error"}`}>
+            {fundsReleased ? "Released" : "Locked"}
+          </span>
         </p>
       </div>
-    </div>
+      <div className="w-full p-6 bg-secondary">
+        <progress
+          className={`progress  w-full ${milestonesCompleted ? "progress-success" : "progress-warning"}`}
+          value={milestonesCompleted ? milestonesCount : 0}
+          max={milestonesCount}
+        >
+          {milestonesCompleted ? milestonesCount : 0} / {milestonesCount}
+        </progress>
+      </div>
+    </section>
   );
 };
 
@@ -58,33 +77,37 @@ export const GoalsList = ({ address }: { address: AddressType }) => {
   const { goalNonce } = useGoalNonce(address);
 
   return (
-    <>
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-2">Your Account</h2>
-        <div className="flex items-center gap-2">
-          <p>Address:</p>
-          <Address address={address} format="long" />
+    <div className="space-y-8">
+      <div>
+        <h3 className="text-5xl font-semibold mb-2 text-center p-4">✨ Your Awesome Goals ✨</h3>
+        <div className="card card-body bg-base-100 flex md:flex-row flex-col justify-between w-full">
+          <UserEthereum address={address} />
+          <p className="text-right">Write Your Vision</p>
         </div>
-        <p>Goal Nonce: {Number(goalNonce)}</p>
       </div>
 
-      <div className="mt-10">
-        <h2 className="text-xl font-semibold mb-2">All Goals</h2>
+      <div className="h-32">
+        <RandomMotivation />
+      </div>
+
+      <section className="flex-1 space-y-6">
+        <h4 className="text-3xl font-semibold mb-2 flex items-center gap-2">
+          <Target2 width={36} height={36} />
+          Your Epic Goals
+        </h4>
         <ul className="space-y-4">
           {Array.from({ length: Number(goalNonce) }).map((_, index) => {
             const goalHash = getGoalHash(address, index);
             return (
               <li key={index}>
-                {address && (
-                  <Link href={`/goals/${goalHash}`}>
-                    <GoalSummary goalHash={goalHash} />
-                  </Link>
-                )}
+                <Link href={`/goals/${goalHash}`}>
+                  <GoalSummary goalHash={goalHash} />
+                </Link>
               </li>
             );
           })}
         </ul>
-      </div>
-    </>
+      </section>
+    </div>
   );
 };

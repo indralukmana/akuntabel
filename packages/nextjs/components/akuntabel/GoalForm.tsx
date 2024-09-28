@@ -3,11 +3,11 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Address as AddressType, parseEther } from "viem";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
-import { NetworkInfo } from "~~/components/NetworkInfo";
 import { RandomMotivation } from "~~/components/akuntabel/RandomMotivation";
+import { UserEthereum } from "~~/components/akuntabel/UserEthereum";
 import { Bow } from "~~/components/icons/Bow";
 import { Target2 } from "~~/components/icons/Target2";
-import { Address, AddressInput, Balance, InputBase } from "~~/components/scaffold-eth";
+import { AddressInput, InputBase } from "~~/components/scaffold-eth";
 import { useGoalNonce } from "~~/hooks/akuntabel/useGoalNonce";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
@@ -94,11 +94,7 @@ export const GoalForm = ({ address }: { address: AddressType }) => {
 
       <div className="card-body flex flex-col md:flex-row w-full ">
         <div className="flex-1 flex flex-col space-y-4">
-          <div className="flex items-center justify-between flex-col md:flex-row">
-            <Address address={address} format="short" />
-            <Balance address={address} />
-            <NetworkInfo />
-          </div>
+          <UserEthereum address={address} />
           <div className="flex-1">
             <RandomMotivation />
           </div>

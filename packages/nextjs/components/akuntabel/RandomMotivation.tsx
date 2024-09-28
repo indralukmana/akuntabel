@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useState } from "react";
+import { ArrowPathIcon } from "@heroicons/react/24/solid";
 
 const randomMotivations = [
   {
@@ -1342,10 +1343,20 @@ export const RandomMotivation = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const changeMotivation = () => {
+    const randomIndex = Math.floor(Math.random() * randomMotivations.length);
+    setMotivation(randomMotivations[randomIndex]);
+  };
+
   return (
     <div className="h-full w-full border rounded-lg p-4 flex flex-col justify-between">
       <blockquote className="text-lg italic">&quot;{motivation.quote}&quot;</blockquote>
-      <span className="text-sm text-right">{motivation.author}</span>
+      <div className="flex justify-between">
+        <button type="button" onClick={changeMotivation} title="Change">
+          <ArrowPathIcon width={24} height={24} />
+        </button>
+        <span className="text-sm text-right">{motivation.author}</span>
+      </div>
     </div>
   );
 };
