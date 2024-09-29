@@ -88,8 +88,7 @@ yarn install
 
 ### Local Blockchain
 
-> [!IMPORTANT] IMPORTANT
->
+> [!IMPORTANT]
 > To work on the project on a local blockchain you need to change the scaffold
 > eth config to use the local hardhat network. You can do this by editing the
 > `packages/nextjs/scaffold.config.ts` file. And change the `targetNetwork` to
@@ -108,7 +107,7 @@ running the following command:
 yarn start
 ```
 
-> [!TIP] Tip
+> [!TIP]
 >
 > The project is a monorepo managed with yarn workspaces. Check the
 > `package.json` for the bootstraped commands.
