@@ -97,7 +97,7 @@ yarn install
 Start the local hardhat network by running the following command:
 
 ```bash
-yarn chaian
+yarn chain
 ```
 
 After that open a new terminal **and** start the frontend development server by
